@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário de Segurança Viária - 2026 (v3.5 Cor Internacional Coral)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Paleta de Cores Atualizada */
+            --cor-data-comemorativa: #FDEEA6; 
+            --cor-campanha: #B4E3F8; 
+            --cor-evento: #ECD9EE; 
+            --cor-feriado: #B9B7B7; 
+            --cor-seguranca-viaria: #F2AAA6; 
+            --cor-senatran: #C0EADA;
+            
+            /* Novas Cores */
+            --cor-regionais: #9FA8DA; /* Indigo/Lavanda */
+            --cor-premiacoes: #C5E1A5; /* Verde Claro */
+            --cor-internacional: #FFAB91; /* Coral Suave - Alterado para destaque */
+            
+            --cor-titulo-mes: #002060;
+            --cor-texto-tema-senatran: #2d5a4c;
+            
+            --cor-texto: #2c3e50;
+            --cor-texto-suave: #7f8c8d;
+            --cor-borda: #E0E0E0;
+            --bg-site: #f0f2f5;
+            --bg-sidebar: #ffffff;
+            --bg-dia-preenchido: #f2f2f2;
+            --cor-primaria: #002060;
+            --cor-danger: #e74c3c;
+            --cor-hoje: #3498db;
+        }
+
+        * { box-sizing: border-box; }
+
+        body { 
+            font-family: 'Open Sans', sans-serif; 
+            background-color: var(--bg-site); 
+            margin: 0; padding: 0; color: var(--cor-texto);
+            line-height: 1.4;
+            height: 100vh; /* Ocupa altura total da tela */
+            overflow: hidden; /* Impede rolagem na janela principal */
+            display: flex; /* Layout Flexbox Principal */
+            flex-direction: column;
+        }
+
+        /* --- SIDEBAR (PAINEL LATERAL) --- */
+        .layout-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--cor-borda);
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            overflow-y: auto;
+            flex-shrink: 0; /* Impede que a sidebar encolha */
+            z-index: 10;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.03);
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto; /* Barra de rolagem APENAS aqui */
+            padding: 30px;
+            position: relative;
+            background-color: var(--bg-site);
+        }
+
+        /* Header dentro da Sidebar */
+        header {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 1px solid var(--cor-borda);
+            padding-bottom: 20px;
+        }
+
+        .logo-container {
+            width: 100%;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            max-height: 80px;
+            height: auto;
+            display: block;
+        }
+
+        .logo-fallback {
+            font-weight: 800;
+            color: var(--cor-primaria);
+            font-size: 1.5em;
+            border: 3px solid var(--cor-primaria);
+            padding: 5px 15px;
+            display: none;
+            text-transform: uppercase;
+        }
+
+        h1 { font-weight: 700; font-size: 1.2em; color: var(--cor-titulo-mes); margin: 0; text-transform: uppercase; line-height: 1.3; }
+        .subtitle { font-size: 1.1em; color: var(--cor-texto-suave); margin-top: 5px; font-weight: 700; letter-spacing: 1px; }
+
+        /* --- FILTROS NO PAINEL LATERAL --- */
+        #legenda-titulo {
+            font-size: 0.85em;
+            text-transform: uppercase;
+            color: var(--cor-texto-suave);
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        #legenda { 
+            display: flex; 
+            flex-direction: column; /* Vertical na sidebar */
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .legenda-item { 
+            display: flex; align-items: center; font-size: 0.9em; font-weight: 600; 
+            cursor: pointer; padding: 10px 15px; border-radius: 8px; border: 1px solid transparent;
+            transition: all 0.2s ease; user-select: none; background: #f8f9fa;
+            width: 100%; /* Botão ocupa largura total */
+        }
+
+        .legenda-item:hover { transform: translateX(5px); background: #f0f0f0; }
+        .legenda-item.desativado { opacity: 0.5; filter: grayscale(1); background: transparent; }
+        .legenda-item.ativo { background: #fff; border-color: var(--cor-borda); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        .marcador { width: 14px; height: 14px; border-radius: 4px; margin-right: 10px; flex-shrink: 0; }
+
+        /* Cores dos marcadores e tags */
+        .bg-comemorativa, .tag-data-comemorativa { background-color: var(--cor-data-comemorativa) !important; }
+        .bg-campanha, .tag-campanha { background-color: var(--cor-campanha) !important; }
+        .bg-evento, .tag-evento { background-color: var(--cor-evento) !important; }
+        .bg-feriado, .tag-feriado-nacional { background-color: var(--cor-feriado) !important; }
+        .bg-seguranca, .tag-seguranca-viaria { background-color: var(--cor-seguranca-viaria) !important; }
+        .bg-senatran, .tag-senatran { background-color: var(--cor-senatran) !important; }
+        .bg-regionais, .tag-eventos-regionais { background-color: var(--cor-regionais) !important; }
+        .bg-premiacoes, .tag-premiacoes { background-color: var(--cor-premiacoes) !important; }
+        .bg-internacional, .tag-datas-internacionais { background-color: var(--cor-internacional) !important; }
+
+        /* --- CALENDÁRIO --- */
+        .calendario-container { 
+            max-width: 1000px; /* Limita largura no painel direito para leitura confortável */
+            margin: 0 auto; 
+            display: grid; grid-template-columns: 1fr; gap: 30px; 
+            padding-bottom: 80px; /* Espaço para o botão FAB */
+        }
+
+        .mes { 
+            background: #fff; border-radius: 12px; border: 1px solid var(--cor-borda); 
+            padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); 
+            overflow-x: auto; 
+        }
+
+        .mes h2 { font-size: 1.6em; color: var(--cor-titulo-mes); margin: 0; text-transform: capitalize; text-align: left; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 15px; }
+        
+        .tema-senatran-mensal { 
+            font-size: 0.9em; color: var(--cor-texto-tema-senatran); 
+            font-weight: 700; margin-bottom: 15px; padding: 8px 12px;
+            background: #eafff8; border-left: 4px solid var(--cor-senatran);
+            border-radius: 4px; display: inline-block;
+        }
+
+        .tabela-dias { width: 100%; border-collapse: separate; border-spacing: 4px; table-layout: fixed; min-width: 300px; }
+        .tabela-dias th { padding: 10px; color: var(--cor-texto-suave); font-size: 0.75em; text-transform: uppercase; font-weight: 700; text-align: center; background: #fcfcfc; border-radius: 4px; }
+        
+        .tabela-dias td { 
+            height: 100px; vertical-align: top; border: 1px solid #f1f1f1; 
+            border-radius: 8px; padding: 5px; position: relative; 
+            background-color: #fff; overflow: hidden; transition: border-color 0.2s;
+        }
+        
+        .tabela-dias td:hover { border-color: #ddd; }
+        .tabela-dias td.tem-evento { background-color: #fafafa !important; }
+
+        .dia-numero { font-weight: 700; font-size: 1em; color: #ccc; margin-bottom: 4px; display: inline-block; padding: 2px 6px; border-radius: 4px; }
+        
+        .dia-atual { border: 2px solid var(--cor-hoje) !important; background-color: rgba(52, 152, 219, 0.05) !important; }
+        .dia-atual .dia-numero { background-color: var(--cor-hoje); color: white !important; }
+
+        .evento-tag { 
+            font-size: 0.7em; line-height: 1.2; font-weight: 600; padding: 3px 6px; border-radius: 4px; 
+            margin-bottom: 3px; display: block; color: #1a252f; border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer; transition: transform 0.1s;
+        }
+        .evento-tag:hover { transform: scale(1.02); opacity: 0.9; }
+
+        /* --- UI ELEMENTS --- */
+        .fab {
+            position: fixed; bottom: 30px; right: 40px; width: 60px; height: 60px; border-radius: 50%;
+            background: var(--cor-primaria); color: white; display: flex; align-items: center; justify-content: center;
+            font-size: 28px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: none; z-index: 100;
+            transition: transform 0.2s;
+        }
+        .fab:hover { transform: scale(1.1); }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px);
+            padding: 15px;
+        }
+        .modal.active { display: flex; }
+        
+        .modal-content { 
+            background: white; padding: 25px; border-radius: 16px; width: 100%; max-width: 480px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
+            max-height: 90vh; overflow-y: auto; 
+        }
+
+        /* Formulário */
+        .form-row { display: block; width: 100%; margin-bottom: 15px; }
+        .form-row .form-group { margin-bottom: 15px; }
+        .form-row .form-group:last-child { margin-bottom: 0; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; min-width: 0; width: 100%; }
+        .form-group label { font-size: 0.9em; font-weight: 600; color: var(--cor-texto); }
+        .form-group input, .form-group select { 
+            width: 100%; padding: 12px; border: 1px solid var(--cor-borda); border-radius: 8px; 
+            font-family: inherit; font-size: 0.95em; height: 48px; background-color: #fff; 
+            -webkit-appearance: none; appearance: none; margin: 0;
+        }
+
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
+        @media (min-width: 480px) { .btn-group { flex-direction: row; } }
+
+        .btn { flex: 1; padding: 14px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 1em; transition: opacity 0.2s; min-width: 100px; text-align: center; }
+        .btn-save { background: var(--cor-primaria); color: white; order: -1; }
+        .btn-cancel { background: #f1f3f5; color: #555; }
+        .btn-danger { background: var(--cor-danger); color: white; }
+
+        #status-cloud {
+            padding: 8px 15px;
+            background: rgba(0,0,0,0.7); color: #fff; border-radius: 20px; font-size: 0.75em; 
+            display: flex; align-items: center; gap: 8px; margin-top: auto; /* Empurra para o fim da sidebar se possível */
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #bbb; }
+        .dot.online { background: #4CAF50; }
+
+        /* --- RESPONSIVIDADE (MOBILE) --- */
+        @media (max-width: 900px) {
+            body { 
+                overflow: auto; /* Volta a rolar a página inteira no mobile */
+                height: auto; 
+                display: block;
+            }
+            
+            .layout-container {
+                flex-direction: column; /* Empilha: Sidebar em cima, Conteúdo em baixo */
+                overflow: visible;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--cor-borda);
+                padding: 15px;
+                position: relative;
+                overflow: visible;
+            }
+
+            header {
+                flex-direction: row; /* Logo e Título lado a lado no mobile */
+                text-align: left;
+                margin-bottom: 15px;
+                padding-bottom: 0;
+                border-bottom: none;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .logo-container { width: auto; margin: 0; max-width: 80px; }
+            .logo-container img { max-height: 50px; }
+            h1 { font-size: 1em; }
+
+            #legenda-titulo { display: none; } /* Oculta título "Filtros" no mobile para economizar espaço */
+
+            #legenda {
+                flex-direction: row; /* Botões lado a lado */
+                overflow-x: auto; /* Rolagem horizontal se necessário */
+                padding-bottom: 5px;
+                gap: 8px;
+            }
+
+            .legenda-item {
+                width: auto; /* Largura automática */
+                white-space: nowrap;
+                padding: 6px 12px;
+                font-size: 0.8em;
+                flex-shrink: 0;
+            }
+
+            .main-content {
+                padding: 15px;
+                overflow: visible;
+                height: auto;
+            }
+
+            .calendario-container { padding-bottom: 60px; }
+            .tabela-dias td { height: 80px; }
+            
+            #status-cloud {
+                position: fixed; bottom: 10px; left: 10px; z-index: 2000; margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="layout-container">
+        <!-- PAINEL LATERAL -->
+        <div class="sidebar">
+            <header>
+                <div class="logo-container">
+                    <img src="https://www.detran.sp.gov.br/702a783633529610cd8381ac4f5c7b5b.iix" 
+                         alt="Logótipo Detran SP" 
+                         id="main-logo"
+                         onerror="handleLogoError(this)">
+                    <div class="logo-fallback" id="logo-text">Detran SP</div>
+                </div>
+                <div>
+                    <h1>Calendário de Segurança Viária</h1>
+                    <div class="subtitle">2026</div>
+                </div>
+            </header>
+
+            <div id="legenda-titulo">Filtrar Categorias</div>
+            <div id="legenda">
+                <div class="legenda-item ativo" data-cat="feriado-nacional" onclick="selecionarFiltro('feriado-nacional', this)">
+                    <div class="marcador bg-feriado"></div> Feriados
+                </div>
+                <div class="legenda-item ativo" data-cat="data-comemorativa" onclick="selecionarFiltro('data-comemorativa', this)">
+                    <div class="marcador bg-comemorativa"></div> Comemorativa
+                </div>
+                <div class="legenda-item ativo" data-cat="seguranca-viaria" onclick="selecionarFiltro('seguranca-viaria', this)">
+                    <div class="marcador bg-seguranca"></div> Segurança Viária
+                </div>
+                <div class="legenda-item ativo" data-cat="senatran" onclick="selecionarFiltro('senatran', this)">
+                    <div class="marcador bg-senatran"></div> SENATRAN
+                </div>
+                <div class="legenda-item ativo" data-cat="eventos-regionais" onclick="selecionarFiltro('eventos-regionais', this)">
+                    <div class="marcador bg-regionais"></div> Regionais
+                </div>
+                <div class="legenda-item ativo" data-cat="premiacoes" onclick="selecionarFiltro('premiacoes', this)">
+                    <div class="marcador bg-premiacoes"></div> Premiações
+                </div>
+                <div class="legenda-item ativo" data-cat="datas-internacionais" onclick="selecionarFiltro('datas-internacionais', this)">
+                    <div class="marcador bg-internacional"></div> Datas Internacionais
+                </div>
+                <div class="legenda-item ativo" data-cat="evento" onclick="selecionarFiltro('evento', this)">
+                    <div class="marcador bg-evento"></div> Eventos
+                </div>
+                <div class="legenda-item ativo" data-cat="campanha" onclick="selecionarFiltro('campanha', this)">
+                    <div class="marcador bg-campanha"></div> Campanhas
+                </div>
+            </div>
+
+            <!-- Status Cloud movido para a sidebar no Desktop -->
+            <div style="flex: 1;"></div> <!-- Espaçador -->
+            <div id="status-cloud">
+                <div class="dot" id="cloud-dot"></div>
+                <span id="cloud-text">Conectando...</span>
+            </div>
+        </div>
+
+        <!-- ÁREA PRINCIPAL -->
+        <div class="main-content">
+            <div class="calendario-container" id="calendario"></div>
+        </div>
+    </div>
+
+    <!-- BOTÃO FLUTUANTE -->
+    <button class="fab" id="open-modal" title="Adicionar Novo Evento">+</button>
+
+    <!-- MODAL -->
+    <div class="modal" id="modal-evento">
+        <div class="modal-content">
+            <h3 id="modal-title" style="margin-top: 0; margin-bottom: 20px; color: var(--cor-titulo-mes);">Novo Evento</h3>
+            <input type="hidden" id="ev-id">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="ev-nome">Nome do Evento</label>
+                <input type="text" id="ev-nome" placeholder="Ex: Campanha de Maio Amarelo">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="ev-inicio">Início</label>
+                    <input type="date" id="ev-inicio">
+                </div>
+                <div class="form-group">
+                    <label for="ev-fim">Término</label>
+                    <input type="date" id="ev-fim">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ev-cat">Categoria</label>
+                <select id="ev-cat">
+                    <option value="evento">Evento Geral</option>
+                    <option value="seguranca-viaria">Segurança Viária</option>
+                    <option value="campanha">Campanha</option>
+                    <option value="data-comemorativa">Data Comemorativa</option>
+                    <option value="senatran">SENATRAN</option>
+                    <option value="eventos-regionais">Festas Regionais</option>
+                    <option value="premiacoes">Premiações</option>
+                    <option value="datas-internacionais">Datas Internacionais</option>
+                    <option value="feriado-nacional">Feriado</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-cancel" onclick="closeModal('modal-evento')">Voltar</button>
+                <button class="btn btn-danger" id="btn-delete-active" style="display:none">Excluir</button>
+                <button class="btn btn-save" id="save-evento">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleLogoError(img) {
+            img.style.display = 'none';
+            const fallback = document.getElementById('logo-text');
+            if (fallback) fallback.style.display = 'block';
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, updateDoc, onSnapshot, addDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'calendario-seg-2026';
+
+        const TODAS_CATEGORIAS = ['evento', 'seguranca-viaria', 'campanha', 'data-comemorativa', 'senatran', 'eventos-regionais', 'premiacoes', 'feriado-nacional', 'datas-internacionais'];
+
+        let state = {
+            eventos: [],
+            filtrosAtivos: [...TODAS_CATEGORIAS],
+            categoriaIsolada: null,
+            user: null
+        };
+
+        const DADOS_INICIAIS = [
+            {inicio: "2026-01-01", fim: "2026-01-01", nome: "Confraternização Universal", cat: "feriado-nacional"},
+            {inicio: "2026-01-11", fim: "2026-01-11", nome: "Aniversário da Gestão", cat: "data-comemorativa"},
+            {inicio: "2026-01-25", fim: "2026-01-25", nome: "Aniversário de SP", cat: "data-comemorativa"},
+            {inicio: "2026-02-16", fim: "2026-02-17", nome: "Carnaval", cat: "feriado-nacional"},
+            {inicio: "2026-04-21", fim: "2026-04-21", nome: "Dia Mundial da Paz no Trânsito", cat: "senatran"},
+            {inicio: "2026-01-15", fim: "2026-01-15", nome: "PRaVida - Último dia Manifestação de Interesse", cat: "seguranca-viaria"},
+            {inicio: "2026-01-28", fim: "2026-01-28", nome: "PRaVida - Enquadrados C1 e C3 | Selecionados C2", cat: "seguranca-viaria"},
+            {inicio: "2026-02-13", fim: "2026-02-13", nome: "PRaVida - Fim das propostas técnicas C1 e C3", cat: "seguranca-viaria"},
+            {inicio: "2026-03-09", fim: "2026-03-09", nome: "PRaVida - Divulgação dos Selecionados C3", cat: "seguranca-viaria"},
+            {inicio: "2026-03-13", fim: "2026-03-13", nome: "PRaVida - Divulgação dos Selecionados C1", cat: "seguranca-viaria"},
+            {inicio: "2026-03-13", fim: "2026-03-13", nome: "PRaVida - Início da assinatura dos convênios", cat: "seguranca-viaria"},
+            {inicio: "2026-04-02", fim: "2026-04-02", nome: "PRaVida - Último dia Assinatura dos convênios", cat: "seguranca-viaria"},
+            {inicio: "2026-02-13", fim: "2026-02-17", nome: "Campanha de Carnaval", cat: "campanha"},
+            {inicio: "2026-03-10", fim: "2026-03-11", nome: "AND Tech", cat: "evento"},
+            {inicio: "2026-08-17", fim: "2026-08-18", nome: "FENABRAVE", cat: "evento"},
+            {inicio: "2026-09-18", fim: "2026-09-25", nome: "Semana Nacional de Trânsito", cat: "senatran"},
+            {inicio: "2026-02-08", fim: "2026-02-08", nome: "Aniversário da Op. Alcoolemia", cat: "data-comemorativa"},
+            {inicio: "2026-02-18", fim: "2026-02-18", nome: "Quarta-feira de Cinzas", cat: "feriado-nacional"},
+            {inicio: "2026-03-01", fim: "2026-03-01", nome: "Aniversário Prog. Integridade", cat: "data-comemorativa"},
+            {inicio: "2026-03-08", fim: "2026-03-08", nome: "Dia Int. da Mulher", cat: "datas-internacionais"},
+            {inicio: "2026-04-03", fim: "2026-04-03", nome: "Paixão de Cristo", cat: "feriado-nacional"},
+            {inicio: "2026-04-05", fim: "2026-04-05", nome: "Páscoa", cat: "feriado-nacional"},
+            {inicio: "2026-04-07", fim: "2026-04-07", nome: "Dia Mundial da Saúde", cat: "datas-internacionais"},
+            {inicio: "2026-04-21", fim: "2026-04-21", nome: "Tiradentes", cat: "feriado-nacional"},
+            {inicio: "2026-04-28", fim: "2026-04-28", nome: "Dia Seg. e Saúde no Trabalho", cat: "data-comemorativa"},
+            {inicio: "2026-05-01", fim: "2026-05-01", nome: "Aniversário 2 anos SISTRAN", cat: "data-comemorativa"},
+            {inicio: "2026-05-05", fim: "2026-05-05", nome: "Dia Mundial do Trânsito", cat: "senatran"},
+            {inicio: "2026-05-10", fim: "2026-05-10", nome: "Dia das Mães", cat: "feriado-nacional"},
+            {inicio: "2026-05-11", fim: "2026-05-11", nome: "Dia do Agente de Trânsito", cat: "senatran"},
+            {inicio: "2026-05-13", fim: "2026-05-13", nome: "Dia do Automóvel", cat: "senatran"},
+            {inicio: "2026-06-03", fim: "2026-06-03", nome: "Dia Mundial da Bicicleta", cat: "senatran"},
+            {inicio: "2026-06-04", fim: "2026-06-04", nome: "Corpus Christi", cat: "feriado-nacional"},
+            {inicio: "2026-06-05", fim: "2026-06-05", nome: "Dia Mundial do Meio Ambiente", cat: "datas-internacionais"},
+            {inicio: "2026-06-19", fim: "2026-06-19", nome: "Aniversário Lei Seca (18 anos)", cat: "senatran"},
+            {inicio: "2026-06-24", fim: "2026-06-24", nome: "Dia de São João", cat: "data-comemorativa"},
+            {inicio: "2026-07-11", fim: "2026-07-11", nome: "Dia Nac. do Socorrista", cat: "data-comemorativa"},
+            {inicio: "2026-07-25", fim: "2026-07-25", nome: "Dia do Motorista", cat: "senatran"},
+            {inicio: "2026-07-27", fim: "2026-07-27", nome: "Dia do Motociclista", cat: "senatran"},
+            {inicio: "2026-08-08", fim: "2026-08-08", nome: "Dia Nac. do Pedestre", cat: "senatran"},
+            {inicio: "2026-08-09", fim: "2026-08-09", nome: "Dia dos Pais", cat: "feriado-nacional"},
+            {inicio: "2026-08-19", fim: "2026-08-19", nome: "Dia do Ciclista", cat: "senatran"},
+            {inicio: "2026-08-21", fim: "2026-08-21", nome: "Dia da CNH", cat: "senatran"},
+            {inicio: "2026-09-16", fim: "2026-09-16", nome: "Dia Nac. do Caminhoneiro", cat: "senatran"},
+            {inicio: "2026-09-22", fim: "2026-09-22", nome: "Dia Mundial Sem Carro | Dia Nacional da Carona", cat: "senatran"},
+            {inicio: "2026-09-23", fim: "2026-09-23", nome: "29 anos do CTB", cat: "senatran"},
+            {inicio: "2026-09-25", fim: "2026-09-25", nome: "Dia Nacional do Trânsito", cat: "senatran"},
+            {inicio: "2026-10-01", fim: "2026-10-01", nome: "Dia Nac. e Intern. da Pessoa Idosa", cat: "data-comemorativa"},
+            {inicio: "2026-10-11", fim: "2026-10-11", nome: "Dia da Pessoa com Deficiência Física", cat: "data-comemorativa"},
+            {inicio: "2026-10-15", fim: "2026-10-15", nome: "Dia do Professor", cat: "data-comemorativa"},
+            {inicio: "2026-10-28", fim: "2026-10-28", nome: "Dia do Servidor Público", cat: "feriado-nacional"},
+            {inicio: "2026-11-17", fim: "2026-11-17", nome: "Dia Vítimas de Trânsito", cat: "senatran"},
+            {inicio: "2026-12-09", fim: "2026-12-09", nome: "Combate à Corrupção", cat: "data-comemorativa"},
+            {inicio: "2026-03-19", fim: "2026-03-22", nome: "Rodeio de Nova Granada", cat: "eventos-regionais"},
+            {inicio: "2026-01-16", fim: "2026-01-19", nome: "Peão Santa Cruz Rio Pardo", cat: "eventos-regionais"},
+            {inicio: "2026-04-09", fim: "2026-04-12", nome: "Suzano Music Festival", cat: "eventos-regionais"},
+            {inicio: "2026-05-08", fim: "2026-05-17", nome: "Peão de Hortolândia", cat: "eventos-regionais"},
+            {inicio: "2026-04-10", fim: "2026-04-18", nome: "Peão de Paulínia", cat: "eventos-regionais"},
+            {inicio: "2026-04-17", fim: "2026-04-20", nome: "FAPIP – Peão de Palmital", cat: "eventos-regionais"},
+            {inicio: "2026-04-30", fim: "2026-05-09", nome: "Ribeirão Rodeo Music", cat: "eventos-regionais"},
+            {inicio: "2026-07-08", fim: "2026-07-12", nome: "Rio Preto Country Bulls", cat: "eventos-regionais"},
+            {inicio: "2026-08-20", fim: "2026-08-30", nome: "Peão de Barretos", cat: "eventos-regionais"},
+            {inicio: "2026-06-03", fim: "2026-06-14", nome: "Peão de Americana", cat: "eventos-regionais"},
+            {inicio: "2026-05-15", fim: "2026-05-24", nome: "Expô Fernandópolis", cat: "eventos-regionais"},
+            {inicio: "2026-07-09", fim: "2026-07-13", nome: "Festa do Cavalo de Colina", cat: "eventos-regionais"},
+            {inicio: "2026-11-06", fim: "2026-11-08", nome: "Fórmula 1 - GP Brasil", cat: "eventos-regionais"},
+            {inicio: "2026-05-01", fim: "2026-05-01", nome: "Dia do Trabalho", cat: "feriado-nacional"},
+            {inicio: "2026-07-09", fim: "2026-07-09", nome: "Rev. Constitucionalista", cat: "feriado-nacional"},
+            {inicio: "2026-09-07", fim: "2026-09-07", nome: "Independência", cat: "feriado-nacional"},
+            {inicio: "2026-10-12", fim: "2026-10-12", nome: "Nossa Sra. Aparecida", cat: "feriado-nacional"},
+            {inicio: "2026-11-02", fim: "2026-11-02", nome: "Finados", cat: "feriado-nacional"},
+            {inicio: "2026-11-15", fim: "2026-11-15", nome: "Proclamação República", cat: "feriado-nacional"},
+            {inicio: "2026-11-20", fim: "2026-11-20", nome: "Consciência Negra", cat: "feriado-nacional"},
+            {inicio: "2026-12-25", fim: "2026-12-25", nome: "Natal", cat: "feriado-nacional"},
+            {inicio: "2026-09-18", fim: "2026-09-26", nome: "Jaguariúna Rodeo Festival", cat: "eventos-regionais"},
+            {inicio: "2026-08-04", fim: "2026-08-06", nome: "Fi South America | São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-06-26", fim: "2026-06-28", nome: "São Paulo Coffee Festival ", cat: "eventos-regionais"},
+            {inicio: "2026-06-20", fim: "2026-06-20", nome: "BBQ em Bebedouro", cat: "eventos-regionais"},
+            {inicio: "2026-06-19", fim: "2026-06-19", nome: "Expoagro | Franca", cat: "eventos-regionais"},
+            {inicio: "2026-06-03", fim: "2026-06-03", nome: "Festa Bar do Cuca | Matão", cat: "eventos-regionais"},
+            {inicio: "2026-05-30", fim: "2026-05-30", nome: "BBQ em Franca", cat: "eventos-regionais"},
+            {inicio: "2026-05-26", fim: "2026-05-29", nome: "Fispal Food Service | São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-05-23", fim: "2026-05-24", nome: "Virada Cultural de São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-05-21", fim: "2026-05-23", nome: "Prudente Rodeo Bulls", cat: "eventos-regionais"},
+            {inicio: "2026-05-16", fim: "2026-05-16", nome: "Festa do Peão | Guaíra", cat: "eventos-regionais"},
+            {inicio: "2026-05-07", fim: "2026-05-10", nome: "Festa do Peão de Votuporanga", cat: "eventos-regionais"},
+            {inicio: "2026-05-16", fim: "2026-05-16", nome: "25ª Festa do Peão de Boiadeiro de Fernando Prestes", cat: "eventos-regionais"},
+            {inicio: "2026-04-30", fim: "2026-05-02", nome: "Barretos Motor Cycles", cat: "eventos-regionais"},
+            {inicio: "2026-04-30", fim: "2026-05-02", nome: "Festa do Peão de Valentim Gentil", cat: "eventos-regionais"},
+            {inicio: "2026-04-07", fim: "2026-04-09", nome: "Anuga Select Brazil | São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-04-07", fim: "2026-04-07", nome: "Show Guns N'Roses", cat: "eventos-regionais"},
+            {inicio: "2026-03-24", fim: "2026-03-26", nome: "Fruit Attraction São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-03-20", fim: "2026-03-22", nome: "Lollapalooza | São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-03-24", fim: "2026-03-20", nome: "Show Paralalamas do Sucesso | São Carlos", cat: "eventos-regionais"},
+            {inicio: "2026-02-05", fim: "2026-02-05", nome: "BBQ na Floresta | Barretos", cat: "eventos-regionais"},
+            {inicio: "2026-01-16", fim: "2026-01-16", nome: "Show Maiara e Maraísa | Olímpia", cat: "eventos-regionais"},
+            {inicio: "2026-01-15", fim: "2026-02-08", nome: "Festa da Uva de Jundiaí", cat: "eventos-regionais"},
+            {inicio: "2026-08-28", fim: "2026-09-27", nome: "Festa das Flores / Expoflora | Holambra", cat: "eventos-regionais"}
+        ];
+
+        async function popularBancoDeDados() {
+            updateStatus("Sincronizando Base...");
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'eventos');
+            const snapshot = await getDocs(colRef);
+            if (snapshot.size === 0) {
+                for (const ev of DADOS_INICIAIS) { await addDoc(colRef, ev); }
+            }
+            localStorage.setItem('db_initialized_2026_v2.7_detran', 'true');
+        }
+
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        
+        window.selecionarFiltro = (cat, element) => {
+            const itensLegenda = document.querySelectorAll('.legenda-item');
+            if (state.categoriaIsolada === cat) {
+                state.filtrosAtivos = [...TODAS_CATEGORIAS];
+                state.categoriaIsolada = null;
+                itensLegenda.forEach(item => { item.classList.add('ativo'); item.classList.remove('desativado'); });
+            } else {
+                state.filtrosAtivos = [cat];
+                state.categoriaIsolada = cat;
+                itensLegenda.forEach(item => {
+                    if (item.getAttribute('data-cat') === cat) { item.classList.add('ativo'); item.classList.remove('desativado'); }
+                    else { item.classList.remove('ativo'); item.classList.add('desativado'); }
+                });
+            }
+            renderizarCalendario(state.eventos);
+        };
+
+        window.abrirEdicao = (id) => {
+            const ev = state.eventos.find(e => e.id === id);
+            if (!ev) return;
+            document.getElementById('modal-title').innerText = "Editar Evento";
+            document.getElementById('ev-id').value = ev.id;
+            document.getElementById('ev-nome').value = ev.nome;
+            document.getElementById('ev-inicio').value = ev.inicio;
+            document.getElementById('ev-fim').value = ev.fim;
+            document.getElementById('ev-cat').value = ev.cat;
+            document.getElementById('btn-delete-active').style.display = 'block';
+            document.getElementById('modal-evento').classList.add('active');
+        };
+
+        function updateStatus(text, isOnline = false) {
+            const dot = document.getElementById('cloud-dot');
+            const statusText = document.getElementById('cloud-text');
+            if (statusText) statusText.innerText = text;
+            if (dot) dot.className = isOnline ? 'dot online' : 'dot';
+        }
+
+        function expandirEventos(dados) {
+            const expandidos = [];
+            const filtrados = dados.filter(d => state.filtrosAtivos.includes(d.cat.toLowerCase()));
+            filtrados.forEach(item => {
+                const dataInicio = new Date(item.inicio + "T12:00:00");
+                const dataFim = new Date(item.fim + "T12:00:00");
+                let atual = new Date(dataInicio);
+                while (atual <= dataFim) {
+                    expandidos.push({ id: item.id, mes: atual.getMonth() + 1, dia: atual.getDate(), nome: item.nome, cat: item.cat.toLowerCase() });
+                    atual.setDate(atual.getDate() + 1);
+                }
+            });
+            return expandidos;
+        }
+
+        function renderizarCalendario(eventos) {
+            const container = document.getElementById('calendario');
+            container.innerHTML = "";
+            const mesesStr = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            
+            const temasSenatran = [
+                "Dirigir com cuidado, viver com dignidade.",
+                "Retorno às aulas: comprometa-se com a vida.",
+                "Carnaval seguro. Alegria com responsabilidade.",
+                "Áreas calmas, vidas seguras.",
+                "Desacelere. Seu bem maior é a vida.",
+                "Conheça os riscos, evite os sinistros.",
+                "Motoristas: parceiros da vida.",
+                "Ciclista seguro, cidade mais humana.",
+                "Comprometa-se com a Vida.",
+                "Olhos na estrada, não na tela.",
+                "Valorize a vida, dirija com consciência.",
+                "Férias seguras, memórias felizes."
+            ];
+
+            const eventosProcessados = expandirEventos(eventos);
+            const hoje = new Date();
+            const diaHoje = hoje.getDate();
+            const mesHoje = hoje.getMonth() + 1;
+
+            for (let m = 0; m < 12; m++) {
+                const mesAtualNum = m + 1;
+                const primeiroDiaSemana = new Date(2026, m, 1).getDay();
+                const totalDiasNoMes = new Date(2026, m + 1, 0).getDate();
+                
+                let temaMensal = temasSenatran[m];
+
+                let htmlMes = `<div class="mes"><h2>${mesesStr[m]}</h2>`;
+                htmlMes += `<div class="tema-senatran-mensal">SENATRAN: ${temaMensal}</div>`;
+                htmlMes += `<table class="tabela-dias"><thead><tr>`;
+                ["D", "S", "T", "Q", "Q", "S", "S"].forEach(d => htmlMes += `<th>${d}</th>`);
+                htmlMes += `</tr></thead><tbody><tr>`;
+
+                for (let i = 0; i < primeiroDiaSemana; i++) htmlMes += `<td></td>`;
+                for (let dia = 1; dia <= totalDiasNoMes; dia++) {
+                    if ((dia + primeiroDiaSemana - 1) % 7 === 0 && dia !== 1) htmlMes += `</tr><tr>`;
+                    const evsNoDia = eventosProcessados.filter(e => e.mes === mesAtualNum && e.dia === dia);
+                    const ehHoje = (dia === diaHoje && mesAtualNum === mesHoje);
+                    htmlMes += `<td class="${evsNoDia.length > 0 ? 'tem-evento' : ''} ${ehHoje ? 'dia-atual' : ''}"><span class="dia-numero">${dia}</span>`;
+                    evsNoDia.forEach(e => {
+                        htmlMes += `<span class="evento-tag tag-${e.cat}" title="${e.nome}" onclick="abrirEdicao('${e.id}')">${e.nome}</span>`;
+                    });
+                    htmlMes += `</td>`;
+                }
+                const finalCelulas = (primeiroDiaSemana + totalDiasNoMes) % 7;
+                if (finalCelulas !== 0) { for (let i = 0; i < (7 - finalCelulas); i++) htmlMes += `<td></td>`; }
+                container.innerHTML += htmlMes + `</tr></tbody></table></div>`;
+            }
+        }
+
+        async function handleSalvar() {
+            const id = document.getElementById('ev-id').value;
+            const payload = { nome: document.getElementById('ev-nome').value, inicio: document.getElementById('ev-inicio').value, fim: document.getElementById('ev-fim').value, cat: document.getElementById('ev-cat').value };
+            if (!payload.nome || !payload.inicio || !payload.fim) return;
+            updateStatus("Salvando...");
+            try {
+                if (id) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventos', id), payload); }
+                else { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), payload); }
+                closeModal('modal-evento');
+                updateStatus("Salvo", true);
+            } catch (err) { updateStatus("Erro ao salvar"); }
+        }
+
+        async function handleExcluir() {
+            const id = document.getElementById('ev-id').value;
+            if (!id) return;
+            updateStatus("Excluindo...");
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventos', id));
+                closeModal('modal-evento');
+                updateStatus("Excluído", true);
+            } catch (err) { updateStatus("Erro ao excluir"); }
+        }
+
+        document.getElementById('save-evento').onclick = handleSalvar;
+        document.getElementById('btn-delete-active').onclick = handleExcluir;
+        document.getElementById('open-modal').onclick = () => {
+            document.getElementById('modal-title').innerText = "Novo Evento";
+            document.getElementById('ev-id').value = "";
+            document.getElementById('ev-nome').value = "";
+            document.getElementById('ev-inicio').value = new Date().toISOString().split('T')[0];
+            document.getElementById('ev-fim').value = new Date().toISOString().split('T')[0];
+            document.getElementById('btn-delete-active').style.display = 'none';
+            document.getElementById('modal-evento').classList.add('active');
+        };
+
+        const init = async () => {
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); }
+                else { await signInAnonymously(auth); }
+            };
+            await initAuth();
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) return;
+                state.user = user;
+                if (!localStorage.getItem('db_initialized_2026_v2.7_detran')) { await popularBancoDeDados(); }
+                updateStatus("Online", true);
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), (snapshot) => {
+                    const list = [];
+                    snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
+                    state.eventos = list;
+                    renderizarCalendario(state.eventos);
+                }, () => updateStatus("Erro Cloud"));
+            });
+        };
+
+        init();
+    </script>
+</body>
+</html>
