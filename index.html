@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendário de Segurança Viária - 2026 (v3.5 Cor Internacional Coral)</title>
+    <title>Calendário de Segurança Viária - 2026 (v3.6 Com Exportação)</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -225,6 +225,31 @@
             max-height: 90vh; overflow-y: auto; 
         }
 
+        /* Botão de Exportação */
+        .btn-export-container {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--cor-borda);
+            width: 100%;
+        }
+        .btn-export {
+            background-color: #34495e;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+        .btn-export:hover { background-color: #2c3e50; }
+
         /* Formulário */
         .form-row { display: block; width: 100%; margin-bottom: 15px; }
         .form-row .form-group { margin-bottom: 15px; }
@@ -373,6 +398,13 @@
                 </div>
             </div>
 
+            <!-- Botão de Exportação -->
+            <div class="btn-export-container">
+                <button class="btn-export" onclick="exportarDados()">
+                    ⬇ Baixar Backup (JSON)
+                </button>
+            </div>
+
             <!-- Status Cloud movido para a sidebar no Desktop -->
             <div style="flex: 1;"></div> <!-- Espaçador -->
             <div id="status-cloud">
@@ -512,51 +544,51 @@
             {inicio: "2026-10-28", fim: "2026-10-28", nome: "Dia do Servidor Público", cat: "feriado-nacional"},
             {inicio: "2026-11-17", fim: "2026-11-17", nome: "Dia Vítimas de Trânsito", cat: "senatran"},
             {inicio: "2026-12-09", fim: "2026-12-09", nome: "Combate à Corrupção", cat: "data-comemorativa"},
-            {inicio: "2026-03-19", fim: "2026-03-22", nome: "Rodeio de Nova Granada", cat: "eventos-regionais"},
-            {inicio: "2026-01-16", fim: "2026-01-19", nome: "Peão Santa Cruz Rio Pardo", cat: "eventos-regionais"},
-            {inicio: "2026-04-09", fim: "2026-04-12", nome: "Suzano Music Festival", cat: "eventos-regionais"},
-            {inicio: "2026-05-08", fim: "2026-05-17", nome: "Peão de Hortolândia", cat: "eventos-regionais"},
-            {inicio: "2026-04-10", fim: "2026-04-18", nome: "Peão de Paulínia", cat: "eventos-regionais"},
-            {inicio: "2026-04-17", fim: "2026-04-20", nome: "FAPIP – Peão de Palmital", cat: "eventos-regionais"},
-            {inicio: "2026-04-30", fim: "2026-05-09", nome: "Ribeirão Rodeo Music", cat: "eventos-regionais"},
-            {inicio: "2026-07-08", fim: "2026-07-12", nome: "Rio Preto Country Bulls", cat: "eventos-regionais"},
-            {inicio: "2026-08-20", fim: "2026-08-30", nome: "Peão de Barretos", cat: "eventos-regionais"},
-            {inicio: "2026-06-03", fim: "2026-06-14", nome: "Peão de Americana", cat: "eventos-regionais"},
-            {inicio: "2026-05-15", fim: "2026-05-24", nome: "Expô Fernandópolis", cat: "eventos-regionais"},
-            {inicio: "2026-07-09", fim: "2026-07-13", nome: "Festa do Cavalo de Colina", cat: "eventos-regionais"},
-            {inicio: "2026-11-06", fim: "2026-11-08", nome: "Fórmula 1 - GP Brasil", cat: "eventos-regionais"},
-            {inicio: "2026-05-01", fim: "2026-05-01", nome: "Dia do Trabalho", cat: "feriado-nacional"},
-            {inicio: "2026-07-09", fim: "2026-07-09", nome: "Rev. Constitucionalista", cat: "feriado-nacional"},
-            {inicio: "2026-09-07", fim: "2026-09-07", nome: "Independência", cat: "feriado-nacional"},
-            {inicio: "2026-10-12", fim: "2026-10-12", nome: "Nossa Sra. Aparecida", cat: "feriado-nacional"},
-            {inicio: "2026-11-02", fim: "2026-11-02", nome: "Finados", cat: "feriado-nacional"},
-            {inicio: "2026-11-15", fim: "2026-11-15", nome: "Proclamação República", cat: "feriado-nacional"},
-            {inicio: "2026-11-20", fim: "2026-11-20", nome: "Consciência Negra", cat: "feriado-nacional"},
-            {inicio: "2026-12-25", fim: "2026-12-25", nome: "Natal", cat: "feriado-nacional"},
-            {inicio: "2026-09-18", fim: "2026-09-26", nome: "Jaguariúna Rodeo Festival", cat: "eventos-regionais"},
-            {inicio: "2026-08-04", fim: "2026-08-06", nome: "Fi South America | São Paulo", cat: "eventos-regionais"},
-            {inicio: "2026-06-26", fim: "2026-06-28", nome: "São Paulo Coffee Festival ", cat: "eventos-regionais"},
-            {inicio: "2026-06-20", fim: "2026-06-20", nome: "BBQ em Bebedouro", cat: "eventos-regionais"},
-            {inicio: "2026-06-19", fim: "2026-06-19", nome: "Expoagro | Franca", cat: "eventos-regionais"},
-            {inicio: "2026-06-03", fim: "2026-06-03", nome: "Festa Bar do Cuca | Matão", cat: "eventos-regionais"},
-            {inicio: "2026-05-30", fim: "2026-05-30", nome: "BBQ em Franca", cat: "eventos-regionais"},
-            {inicio: "2026-05-26", fim: "2026-05-29", nome: "Fispal Food Service | São Paulo", cat: "eventos-regionais"},
-            {inicio: "2026-05-23", fim: "2026-05-24", nome: "Virada Cultural de São Paulo", cat: "eventos-regionais"},
-            {inicio: "2026-05-21", fim: "2026-05-23", nome: "Prudente Rodeo Bulls", cat: "eventos-regionais"},
-            {inicio: "2026-05-16", fim: "2026-05-16", nome: "Festa do Peão | Guaíra", cat: "eventos-regionais"},
-            {inicio: "2026-05-07", fim: "2026-05-10", nome: "Festa do Peão de Votuporanga", cat: "eventos-regionais"},
-            {inicio: "2026-05-16", fim: "2026-05-16", nome: "25ª Festa do Peão de Boiadeiro de Fernando Prestes", cat: "eventos-regionais"},
-            {inicio: "2026-04-30", fim: "2026-05-02", nome: "Barretos Motor Cycles", cat: "eventos-regionais"},
-            {inicio: "2026-04-30", fim: "2026-05-02", nome: "Festa do Peão de Valentim Gentil", cat: "eventos-regionais"},
-            {inicio: "2026-04-07", fim: "2026-04-09", nome: "Anuga Select Brazil | São Paulo", cat: "eventos-regionais"},
-            {inicio: "2026-04-07", fim: "2026-04-07", nome: "Show Guns N'Roses", cat: "eventos-regionais"},
-            {inicio: "2026-03-24", fim: "2026-03-26", nome: "Fruit Attraction São Paulo", cat: "eventos-regionais"},
-            {inicio: "2026-03-20", fim: "2026-03-22", nome: "Lollapalooza | São Paulo", cat: "eventos-regionais"},
-            {inicio: "2026-03-24", fim: "2026-03-20", nome: "Show Paralalamas do Sucesso | São Carlos", cat: "eventos-regionais"},
-            {inicio: "2026-02-05", fim: "2026-02-05", nome: "BBQ na Floresta | Barretos", cat: "eventos-regionais"},
-            {inicio: "2026-01-16", fim: "2026-01-16", nome: "Show Maiara e Maraísa | Olímpia", cat: "eventos-regionais"},
-            {inicio: "2026-01-15", fim: "2026-02-08", nome: "Festa da Uva de Jundiaí", cat: "eventos-regionais"},
-            {inicio: "2026-08-28", fim: "2026-09-27", nome: "Festa das Flores / Expoflora | Holambra", cat: "eventos-regionais"}
+            {inicio: "2026-03-19", fim: "2026-03-22", nome: "Rodeio de Nova Granada", "cat": "eventos-regionais"},
+            {inicio: "2026-01-16", fim: "2026-01-19", nome: "Peão Santa Cruz Rio Pardo", "cat": "eventos-regionais"},
+            {inicio: "2026-04-09", fim: "2026-04-12", "nome": "Suzano Music Festival", "cat": "eventos-regionais"},
+            {inicio: "2026-05-08", fim: "2026-05-17", "nome": "Peão de Hortolândia", "cat": "eventos-regionais"},
+            {inicio: "2026-04-10", fim: "2026-04-18", "nome": "Peão de Paulínia", "cat": "eventos-regionais"},
+            {inicio: "2026-04-17", fim: "2026-04-20", "nome": "FAPIP – Peão de Palmital", "cat": "eventos-regionais"},
+            {inicio: "2026-04-30", fim: "2026-05-09", "nome": "Ribeirão Rodeo Music", "cat": "eventos-regionais"},
+            {inicio: "2026-07-08", fim: "2026-07-12", "nome": "Rio Preto Country Bulls", "cat": "eventos-regionais"},
+            {inicio: "2026-08-20", fim: "2026-08-30", "nome": "Peão de Barretos", "cat": "eventos-regionais"},
+            {inicio: "2026-06-03", fim: "2026-06-14", "nome": "Peão de Americana", "cat": "eventos-regionais"},
+            {inicio: "2026-05-15", fim: "2026-05-24", "nome": "Expô Fernandópolis", "cat": "eventos-regionais"},
+            {inicio: "2026-07-09", fim: "2026-07-13", "nome": "Festa do Cavalo de Colina", "cat": "eventos-regionais"},
+            {inicio: "2026-11-06", fim: "2026-11-08", "nome": "Fórmula 1 - GP Brasil", "cat": "eventos-regionais"},
+            {inicio: "2026-05-01", fim: "2026-05-01", "nome": "Dia do Trabalho", "cat": "feriado-nacional"},
+            {inicio: "2026-07-09", fim: "2026-07-09", "nome": "Rev. Constitucionalista", "cat": "feriado-nacional"},
+            {inicio: "2026-09-07", fim: "2026-09-07", "nome": "Independência", "cat": "feriado-nacional"},
+            {inicio: "2026-10-12", fim: "2026-10-12", "nome": "Nossa Sra. Aparecida", "cat": "feriado-nacional"},
+            {inicio: "2026-11-02", fim: "2026-11-02", "nome": "Finados", "cat": "feriado-nacional"},
+            {inicio: "2026-11-15", fim: "2026-11-15", "nome": "Proclamação República", "cat": "feriado-nacional"},
+            {inicio: "2026-11-20", fim: "2026-11-20", "nome": "Consciência Negra", "cat": "feriado-nacional"},
+            {inicio: "2026-12-25", fim: "2026-12-25", "nome": "Natal", "cat": "feriado-nacional"},
+            {inicio: "2026-09-18", fim: "2026-09-26", "nome": "Jaguariúna Rodeo Festival", "cat": "eventos-regionais"},
+            {inicio: "2026-08-04", fim: "2026-08-06", "nome": "Fi South America | São Paulo", "cat": "eventos-regionais"},
+            {inicio: "2026-06-26", fim: "2026-06-28", "nome": "São Paulo Coffee Festival ", "cat": "eventos-regionais"},
+            {inicio: "2026-06-20", fim: "2026-06-20", "nome": "BBQ em Bebedouro", "cat": "eventos-regionais"},
+            {inicio: "2026-06-19", fim: "2026-06-19", "nome": "Expoagro | Franca", "cat": "eventos-regionais"},
+            {inicio: "2026-06-03", fim: "2026-06-03", "nome": "Festa Bar do Cuca | Matão", "cat": "eventos-regionais"},
+            {inicio: "2026-05-30", fim: "2026-05-30", "nome": "BBQ em Franca", "cat": "eventos-regionais"},
+            {inicio: "2026-05-26", fim: "2026-05-29", "nome": "Fispal Food Service | São Paulo", "cat": "eventos-regionais"},
+            {inicio: "2026-05-23", fim: "2026-05-24", "nome": "Virada Cultural de São Paulo", "cat": "eventos-regionais"},
+            {inicio: "2026-05-21", fim: "2026-05-23", "nome": "Prudente Rodeo Bulls", "cat": "eventos-regionais"},
+            {inicio: "2026-05-16", fim: "2026-05-16", "nome": "Festa do Peão | Guaíra", "cat": "eventos-regionais"},
+            {inicio: "2026-05-07", fim: "2026-05-10", "nome": "Festa do Peão de Votuporanga", "cat": "eventos-regionais"},
+            {inicio: "2026-05-16", fim: "2026-05-16", "nome": "25ª Festa do Peão de Boiadeiro de Fernando Prestes", "cat": "eventos-regionais"},
+            {inicio: "2026-04-30", fim: "2026-05-02", "nome": "Barretos Motor Cycles", "cat": "eventos-regionais"},
+            {inicio: "2026-04-30", fim: "2026-05-02", "nome": "Festa do Peão de Valentim Gentil", "cat": "eventos-regionais"},
+            {inicio: "2026-04-07", fim: "2026-04-09", "nome": "Anuga Select Brazil | São Paulo", "cat": "eventos-regionais"},
+            {inicio: "2026-04-07", fim: "2026-04-07", "nome": "Show Guns N'Roses", "cat": "eventos-regionais"},
+            {inicio: "2026-03-24", fim: "2026-03-26", "nome": "Fruit Attraction São Paulo", "cat": "eventos-regionais"},
+            {inicio: "2026-03-20", fim: "2026-03-22", "nome": "Lollapalooza | São Paulo", "cat": "eventos-regionais"},
+            {inicio: "2026-03-24", fim: "2026-03-20", "nome": "Show Paralalamas do Sucesso | São Carlos", "cat": "eventos-regionais"},
+            {inicio: "2026-02-05", fim: "2026-02-05", "nome": "BBQ na Floresta | Barretos", "cat": "eventos-regionais"},
+            {inicio: "2026-01-16", fim: "2026-01-16", "nome": "Show Maiara e Maraísa | Olímpia", "cat": "eventos-regionais"},
+            {inicio: "2026-01-15", fim: "2026-02-08", "nome": "Festa da Uva de Jundiaí", "cat": "eventos-regionais"},
+            {inicio: "2026-08-28", fim: "2026-09-27", "nome": "Festa das Flores / Expoflora | Holambra", "cat": "eventos-regionais"}
         ];
 
         async function popularBancoDeDados() {
@@ -599,6 +631,21 @@
             document.getElementById('ev-cat').value = ev.cat;
             document.getElementById('btn-delete-active').style.display = 'block';
             document.getElementById('modal-evento').classList.add('active');
+        };
+
+        // Função para Exportar/Backup dos Dados
+        window.exportarDados = () => {
+            const dadosStr = JSON.stringify(state.eventos, null, 2);
+            const blob = new Blob([dadosStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "backup_calendario_2026.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         };
 
         function updateStatus(text, isOnline = false) {
