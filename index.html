@@ -556,11 +556,11 @@
                 <select id="ev-cat">
                     <option value="feriados">Feriados</option>
                     <option value="datas-comemorativas">Datas Comemorativas</option>
-                    <option value="acoes-educativas">Ações Educativas</option>
                     <option value="senatran">SENATRAN</option>
                     <option value="sistran">SISTRAN</option>
                     <option value="eventos">Eventos</option>
                     <option value="pravida">PRaVida</option>
+                    <option value="acoes-educativas">Ações Educativas</option>
                     <option value="campanhas-massa">Campanhas de Massa</option>
                     <option value="premiacoes">Premiações</option>
                     <option value="festas-regionais">Festas Regionais</option>
@@ -615,19 +615,27 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const appId = 'calendario-seg-2026'; 
+        // Coleção principal onde os eventos ficam salvos no seu Firestore
+        // (para uso fora do ambiente do Gemini/Artifacts, ex.: GitHub Pages).
+        const EVENTOS_REF = collection(db, 'eventos');
+
+        // Se você ainda tiver dados antigos salvos no caminho 'artifacts/.../eventos',
+        // você pode trocar para este ref abaixo (mantido apenas como referência):
+        // const EVENTOS_REF = EVENTOS_REF;
+
 
         // Ordem exata dos filtros
         const TODAS_CATEGORIAS = [
-            'feriados', 
-            'datas-comemorativas', 
-            'acoes-educativas', 
-            'senatran', 
+            'feriados',
+            'datas-comemorativas',
+            'senatran',
             'sistran',
-            'eventos', 
+            'eventos',
             'pravida',
-            'campanhas-massa', 
-            'premiacoes', 
-            'festas-regionais', 
+            'acoes-educativas',
+            'campanhas-massa',
+            'premiacoes',
+            'festas-regionais',
             'datas-internacionais'
         ];
 
@@ -638,123 +646,19 @@
         };
 
         // Dados Iniciais Atualizados com as Novas Categorias
-        const DADOS_INICIAIS = [
-            {inicio: "2026-01-01", fim: "2026-01-01", nome: "Confraternização Universal", cat: "feriados"},
-            {inicio: "2026-01-11", fim: "2026-01-11", nome: "Aniversário da Gestão", cat: "datas-comemorativas"},
-            {inicio: "2026-01-25", fim: "2026-01-25", nome: "Aniversário de SP", cat: "datas-comemorativas"},
-            {inicio: "2026-02-16", fim: "2026-02-17", nome: "Carnaval", cat: "feriados"},
-            {inicio: "2026-04-21", fim: "2026-04-21", nome: "Dia Mundial da Paz no Trânsito", cat: "senatran"},
-            
-            // PRaVida (Nova Categoria)
-            {inicio: "2026-01-15", fim: "2026-01-15", nome: "PRaVida - Último dia Manifestação de Interesse", cat: "pravida"},
-            {inicio: "2026-01-28", fim: "2026-01-28", nome: "PRaVida - Enquadrados C1 e C3 | Selecionados C2", cat: "pravida"},
-            {inicio: "2026-02-13", fim: "2026-02-13", nome: "PRaVida - Fim das propostas técnicas C1 e C3", cat: "pravida"},
-            {inicio: "2026-03-09", fim: "2026-03-09", nome: "PRaVida - Divulgação dos Selecionados C3", cat: "pravida"},
-            {inicio: "2026-03-13", fim: "2026-03-13", nome: "PRaVida - Divulgação dos Selecionados C1", cat: "pravida"},
-            {inicio: "2026-03-13", fim: "2026-03-13", nome: "PRaVida - Início da assinatura dos convênios", cat: "pravida"},
-            {inicio: "2026-04-02", fim: "2026-04-02", nome: "PRaVida - Último dia Assinatura dos convênios", cat: "pravida"},
-            
-            {inicio: "2026-02-13", fim: "2026-02-17", nome: "Campanha de Carnaval", cat: "campanhas-massa"},
-            {inicio: "2026-03-10", fim: "2026-03-11", nome: "AND Tech", cat: "eventos"},
-            {inicio: "2026-08-17", fim: "2026-08-18", nome: "FENABRAVE", cat: "eventos"},
-            {inicio: "2026-09-18", fim: "2026-09-25", nome: "Semana Nacional de Trânsito", cat: "senatran"},
-            {inicio: "2026-02-08", fim: "2026-02-08", nome: "Aniversário da Op. Alcoolemia", cat: "datas-comemorativas"},
-            {inicio: "2026-02-18", fim: "2026-02-18", nome: "Quarta-feira de Cinzas", cat: "feriados"},
-            {inicio: "2026-03-01", fim: "2026-03-01", nome: "Aniversário Prog. Integridade", cat: "datas-comemorativas"},
-            {inicio: "2026-03-08", fim: "2026-03-08", nome: "Dia Int. da Mulher", cat: "datas-internacionais"},
-            {inicio: "2026-04-03", fim: "2026-04-03", nome: "Paixão de Cristo", cat: "feriados"},
-            {inicio: "2026-04-05", fim: "2026-04-05", nome: "Páscoa", cat: "feriados"},
-            {inicio: "2026-04-07", fim: "2026-04-07", nome: "Dia Mundial da Saúde", cat: "datas-internacionais"},
-            {inicio: "2026-04-21", fim: "2026-04-21", nome: "Tiradentes", cat: "feriados"},
-            {inicio: "2026-04-28", fim: "2026-04-28", nome: "Dia Seg. e Saúde no Trabalho", cat: "datas-comemorativas"},
-            
-            // SISTRAN (Nova Categoria)
-            {inicio: "2026-05-01", fim: "2026-05-01", nome: "Aniversário 2 anos SISTRAN", cat: "sistran"},
-            
-            {inicio: "2026-05-05", fim: "2026-05-05", nome: "Dia Mundial do Trânsito", cat: "senatran"},
-            {inicio: "2026-05-10", fim: "2026-05-10", nome: "Dia das Mães", cat: "feriados"},
-            {inicio: "2026-05-11", fim: "2026-05-11", nome: "Dia do Agente de Trânsito", cat: "senatran"},
-            {inicio: "2026-05-13", fim: "2026-05-13", nome: "Dia do Automóvel", cat: "senatran"},
-            {inicio: "2026-06-03", fim: "2026-06-03", nome: "Dia Mundial da Bicicleta", cat: "senatran"},
-            {inicio: "2026-06-04", fim: "2026-06-04", nome: "Corpus Christi", cat: "feriados"},
-            {inicio: "2026-06-05", fim: "2026-06-05", nome: "Dia Mundial do Meio Ambiente", cat: "datas-internacionais"},
-            {inicio: "2026-06-19", fim: "2026-06-19", nome: "Aniversário Lei Seca (18 anos)", cat: "senatran"},
-            {inicio: "2026-06-24", fim: "2026-06-24", nome: "Dia de São João", cat: "datas-comemorativas"},
-            {inicio: "2026-07-11", fim: "2026-07-11", nome: "Dia Nac. do Socorrista", cat: "datas-comemorativas"},
-            {inicio: "2026-07-25", fim: "2026-07-25", nome: "Dia do Motorista", cat: "senatran"},
-            {inicio: "2026-07-27", fim: "2026-07-27", nome: "Dia do Motociclista", cat: "senatran"},
-            {inicio: "2026-08-08", fim: "2026-08-08", nome: "Dia Nac. do Pedestre", cat: "senatran"},
-            {inicio: "2026-08-09", fim: "2026-08-09", nome: "Dia dos Pais", cat: "feriados"},
-            {inicio: "2026-08-19", fim: "2026-08-19", nome: "Dia do Ciclista", cat: "senatran"},
-            {inicio: "2026-08-21", fim: "2026-08-21", nome: "Dia da CNH", cat: "senatran"},
-            {inicio: "2026-09-16", fim: "2026-09-16", nome: "Dia Nac. do Caminhoneiro", cat: "senatran"},
-            {inicio: "2026-09-22", fim: "2026-09-22", nome: "Dia Mundial Sem Carro | Dia Nacional da Carona", cat: "senatran"},
-            {inicio: "2026-09-23", fim: "2026-09-23", nome: "29 anos do CTB", cat: "senatran"},
-            {inicio: "2026-09-25", fim: "2026-09-25", nome: "Dia Nacional do Trânsito", cat: "senatran"},
-            {inicio: "2026-10-01", fim: "2026-10-01", nome: "Dia Nac. e Intern. da Pessoa Idosa", cat: "datas-comemorativas"},
-            {inicio: "2026-10-11", fim: "2026-10-11", nome: "Dia da Pessoa com Deficiência Física", cat: "datas-comemorativas"},
-            {inicio: "2026-10-15", fim: "2026-10-15", nome: "Dia do Professor", cat: "datas-comemorativas"},
-            {inicio: "2026-10-28", fim: "2026-10-28", nome: "Dia do Servidor Público", cat: "feriados"},
-            {inicio: "2026-11-17", fim: "2026-11-17", nome: "Dia Vítimas de Trânsito", cat: "senatran"},
-            {inicio: "2026-12-09", fim: "2026-12-09", nome: "Combate à Corrupção", cat: "datas-comemorativas"},
-            {inicio: "2026-03-19", fim: "2026-03-22", nome: "Rodeio de Nova Granada", cat: "festas-regionais"},
-            {inicio: "2026-01-16", fim: "2026-01-19", nome: "Peão Santa Cruz Rio Pardo", cat: "festas-regionais"},
-            {inicio: "2026-04-09", fim: "2026-04-12", nome: "Suzano Music Festival", cat: "festas-regionais"},
-            {inicio: "2026-05-08", fim: "2026-05-17", nome: "Peão de Hortolândia", cat: "festas-regionais"},
-            {inicio: "2026-04-10", fim: "2026-04-18", nome: "Peão de Paulínia", cat: "festas-regionais"},
-            {inicio: "2026-04-17", fim: "2026-04-20", nome: "FAPIP – Peão de Palmital", cat: "festas-regionais"},
-            {inicio: "2026-04-30", fim: "2026-05-09", nome: "Ribeirão Rodeo Music", cat: "festas-regionais"},
-            {inicio: "2026-07-08", fim: "2026-07-12", nome: "Rio Preto Country Bulls", cat: "festas-regionais"},
-            {inicio: "2026-08-20", fim: "2026-08-30", nome: "Peão de Barretos", cat: "festas-regionais"},
-            {inicio: "2026-06-03", fim: "2026-06-14", nome: "Peão de Americana", cat: "festas-regionais"},
-            {inicio: "2026-05-15", fim: "2026-05-24", nome: "Expô Fernandópolis", cat: "festas-regionais"},
-            {inicio: "2026-07-09", fim: "2026-07-13", nome: "Festa do Cavalo de Colina", cat: "festas-regionais"},
-            {inicio: "2026-11-06", fim: "2026-11-08", nome: "Fórmula 1 - GP Brasil", cat: "festas-regionais"},
-            {inicio: "2026-05-01", fim: "2026-05-01", nome: "Dia do Trabalho", cat: "feriados"},
-            {inicio: "2026-07-09", fim: "2026-07-09", nome: "Rev. Constitucionalista", cat: "feriados"},
-            {inicio: "2026-09-07", fim: "2026-09-07", nome: "Independência", cat: "feriados"},
-            {inicio: "2026-10-12", fim: "2026-10-12", nome: "Nossa Sra. Aparecida", cat: "feriados"},
-            {inicio: "2026-11-02", fim: "2026-11-02", nome: "Finados", cat: "feriados"},
-            {inicio: "2026-11-15", fim: "2026-11-15", nome: "Proclamação República", cat: "feriados"},
-            {inicio: "2026-11-20", fim: "2026-11-20", nome: "Consciência Negra", cat: "feriados"},
-            {inicio: "2026-12-25", fim: "2026-12-25", nome: "Natal", cat: "feriados"},
-            {inicio: "2026-09-18", fim: "2026-09-26", nome: "Jaguariúna Rodeo Festival", cat: "festas-regionais"},
-            {inicio: "2026-08-04", fim: "2026-08-06", nome: "Fi South America | São Paulo", cat: "festas-regionais"},
-            {inicio: "2026-06-26", fim: "2026-06-28", nome: "São Paulo Coffee Festival ", cat: "festas-regionais"},
-            {inicio: "2026-06-20", fim: "2026-06-20", nome: "BBQ em Bebedouro", cat: "festas-regionais"},
-            {inicio: "2026-06-19", fim: "2026-06-19", nome: "Expoagro | Franca", cat: "festas-regionais"},
-            {inicio: "2026-06-03", fim: "2026-06-03", nome: "Festa Bar do Cuca | Matão", cat: "festas-regionais"},
-            {inicio: "2026-05-30", fim: "2026-05-30", nome: "BBQ em Franca", cat: "festas-regionais"},
-            {inicio: "2026-05-26", fim: "2026-05-29", nome: "Fispal Food Service | São Paulo", cat: "festas-regionais"},
-            {inicio: "2026-05-23", fim: "2026-05-24", nome: "Virada Cultural de São Paulo", cat: "festas-regionais"},
-            {inicio: "2026-05-21", fim: "2026-05-23", nome: "Prudente Rodeo Bulls", cat: "festas-regionais"},
-            {inicio: "2026-05-16", fim: "2026-05-16", nome: "Festa do Peão | Guaíra", cat: "festas-regionais"},
-            {inicio: "2026-05-07", fim: "2026-05-10", nome: "Festa do Peão de Votuporanga", cat: "festas-regionais"},
-            {inicio: "2026-05-16", fim: "2026-05-16", nome: "25ª Festa do Peão de Boiadeiro de Fernando Prestes", cat: "festas-regionais"},
-            {inicio: "2026-04-30", fim: "2026-05-02", nome: "Barretos Motor Cycles", cat: "festas-regionais"},
-            {inicio: "2026-04-30", fim: "2026-05-02", nome: "Festa do Peão de Valentim Gentil", cat: "festas-regionais"},
-            {inicio: "2026-04-07", fim: "2026-04-09", nome: "Anuga Select Brazil | São Paulo", cat: "festas-regionais"},
-            {inicio: "2026-04-07", fim: "2026-04-07", nome: "Show Guns N'Roses", cat: "festas-regionais"},
-            {inicio: "2026-03-24", fim: "2026-03-26", nome: "Fruit Attraction São Paulo", cat: "festas-regionais"},
-            {inicio: "2026-03-20", fim: "2026-03-22", nome: "Lollapalooza | São Paulo", cat: "festas-regionais"},
-            {inicio: "2026-03-24", fim: "2026-03-20", nome: "Show Paralalamas do Sucesso | São Carlos", cat: "festas-regionais"},
-            {inicio: "2026-02-05", fim: "2026-02-05", nome: "BBQ na Floresta | Barretos", cat: "festas-regionais"},
-            {inicio: "2026-01-16", fim: "2026-01-16", nome: "Show Maiara e Maraísa | Olímpia", cat: "festas-regionais"},
-            {inicio: "2026-01-15", fim: "2026-02-08", nome: "Festa da Uva de Jundiaí", cat: "festas-regionais"},
-            {inicio: "2026-08-28", fim: "2026-09-27", nome: "Festa das Flores / Expoflora | Holambra", cat: "festas-regionais"}
-        ];
+        const DADOS_INICIAIS = [];
+
+        // OBS: Eventos iniciais removidos.
+        // O calendário agora depende 100% dos eventos cadastrados no Firebase via painel.
 
         async function popularBancoDeDados() {
-            updateStatus("Sincronizando Base...");
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'eventos');
-            const snapshot = await getDocs(colRef);
-            if (snapshot.size === 0) {
-                for (const ev of DADOS_INICIAIS) { await addDoc(colRef, ev); }
-            }
-            localStorage.setItem('db_initialized_2026_v4.0_detran', 'true');
-        }
+    // Base "limpa": não semeia eventos fixos no código.
+    // Se a coleção estiver vazia, o calendário aparecerá vazio até você cadastrar pelo painel.
+    updateStatus("Online", true);
+    localStorage.setItem('db_initialized_2026_v4.0_detran', 'true');
+}
 
-        window.openModal = (id) => document.getElementById(id).classList.add('active');
+window.openModal = (id) => document.getElementById(id).classList.add('active');
         window.closeModal = (id) => document.getElementById(id).classList.remove('active');
         
         window.limparFiltros = () => {
@@ -954,8 +858,8 @@
             if (!payload.nome || !payload.inicio || !payload.fim) return;
             updateStatus("Salvando...");
             try {
-                if (id) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventos', id), payload); }
-                else { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), payload); }
+                if (id) { await updateDoc(doc(EVENTOS_REF, id), payload); }
+                else { await addDoc(EVENTOS_REF, payload); }
                 closeModal('modal-evento');
                 updateStatus("Salvo", true);
             } catch (err) { updateStatus("Erro ao salvar"); }
@@ -966,7 +870,7 @@
             if (!id) return;
             updateStatus("Excluindo...");
             try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventos', id));
+                await deleteDoc(doc(EVENTOS_REF, id));
                 closeModal('modal-evento');
                 updateStatus("Excluído", true);
             } catch (err) { updateStatus("Erro ao excluir"); }
@@ -995,7 +899,7 @@
                 state.user = user;
                 if (!localStorage.getItem('db_initialized_2026_v4.0_detran')) { await popularBancoDeDados(); }
                 updateStatus("Online", true);
-                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), (snapshot) => {
+                onSnapshot(EVENTOS_REF, (snapshot) => {
                     const list = [];
                     snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
                     state.eventos = list;
