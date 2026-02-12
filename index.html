@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendário de Segurança Viária - 2026 (v3.6 Com Exportação)</title>
+    <title>Calendário de Segurança Viária - 2026 (v3.5 Cor Internacional Coral)</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Paleta de Cores Atualizada */
-            --cor-data-comemorativa: #FDEEA6; 
-            --cor-campanha: #B4E3F8; 
-            --cor-evento: #ECD9EE; 
-            --cor-feriado: #B9B7B7; 
-            --cor-seguranca-viaria: #F2AAA6; 
-            --cor-senatran: #C0EADA;
-            
-            /* Novas Cores */
-            --cor-regionais: #9FA8DA; /* Indigo/Lavanda */
-            --cor-premiacoes: #C5E1A5; /* Verde Claro */
-            --cor-internacional: #FFAB91; /* Coral Suave - Alterado para destaque */
+            /* Paleta de Cores */
+            --cor-data-comemorativa: #FFB3E6; 
+            --cor-campanha: #005CA8; 
+            --cor-evento: #FFA143; 
+            --cor-feriado: #E0E0E0; 
+            --cor-seguranca-viaria: #FFF3C4; 
+            --cor-senatran: #F9EF1F;
+            --cor-festas-regionais: #9FA8DA; 
+            --cor-premiacoes: #81C784; 
+            --cor-internacional: #DEB2B2;
             
             --cor-titulo-mes: #002060;
             --cor-texto-tema-senatran: #2d5a4c;
@@ -82,7 +80,7 @@
             flex-direction: column; 
             align-items: center; 
             text-align: center; 
-            margin-bottom: 30px; 
+            margin-bottom: 20px; 
             border-bottom: 1px solid var(--cor-borda);
             padding-bottom: 20px;
         }
@@ -115,14 +113,58 @@
         h1 { font-weight: 700; font-size: 1.2em; color: var(--cor-titulo-mes); margin: 0; text-transform: uppercase; line-height: 1.3; }
         .subtitle { font-size: 1.1em; color: var(--cor-texto-suave); margin-top: 5px; font-weight: 700; letter-spacing: 1px; }
 
+        /* Botão Sobre */
+        #btn-sobre {
+            background-color: transparent;
+            color: var(--cor-primaria);
+            border: 1px solid var(--cor-primaria);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 25px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        #btn-sobre:hover {
+            background-color: var(--cor-primaria);
+            color: white;
+        }
+
         /* --- FILTROS NO PAINEL LATERAL --- */
+        .filtro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
         #legenda-titulo {
             font-size: 0.85em;
             text-transform: uppercase;
             color: var(--cor-texto-suave);
-            margin-bottom: 15px;
             font-weight: 700;
             letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        #btn-limpar {
+            background: transparent;
+            border: 1px solid var(--cor-borda);
+            border-radius: 4px;
+            color: var(--cor-texto-suave);
+            font-size: 0.75em;
+            padding: 2px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        #btn-limpar:hover {
+            background: var(--cor-primaria);
+            color: white;
+            border-color: var(--cor-primaria);
         }
 
         #legenda { 
@@ -146,13 +188,14 @@
         .marcador { width: 14px; height: 14px; border-radius: 4px; margin-right: 10px; flex-shrink: 0; }
 
         /* Cores dos marcadores e tags */
+        .bg-todos { background-color: #555; color: #fff !important; }
         .bg-comemorativa, .tag-data-comemorativa { background-color: var(--cor-data-comemorativa) !important; }
-        .bg-campanha, .tag-campanha { background-color: var(--cor-campanha) !important; }
+        .bg-campanha, .tag-campanha { background-color: var(--cor-campanha) !important; color: #fff !important; }
         .bg-evento, .tag-evento { background-color: var(--cor-evento) !important; }
         .bg-feriado, .tag-feriado-nacional { background-color: var(--cor-feriado) !important; }
         .bg-seguranca, .tag-seguranca-viaria { background-color: var(--cor-seguranca-viaria) !important; }
         .bg-senatran, .tag-senatran { background-color: var(--cor-senatran) !important; }
-        .bg-regionais, .tag-eventos-regionais { background-color: var(--cor-regionais) !important; }
+        .bg-regionais, .tag-eventos-regionais { background-color: var(--cor-festas-regionais) !important; }
         .bg-premiacoes, .tag-premiacoes { background-color: var(--cor-premiacoes) !important; }
         .bg-internacional, .tag-datas-internacionais { background-color: var(--cor-internacional) !important; }
 
@@ -203,6 +246,13 @@
         }
         .evento-tag:hover { transform: scale(1.02); opacity: 0.9; }
 
+        /* Estilo específico para tag agrupada */
+        .tag-agrupada {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
         /* --- UI ELEMENTS --- */
         .fab {
             position: fixed; bottom: 30px; right: 40px; width: 60px; height: 60px; border-radius: 50%;
@@ -224,31 +274,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
             max-height: 90vh; overflow-y: auto; 
         }
-
-        /* Botão de Exportação */
-        .btn-export-container {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--cor-borda);
-            width: 100%;
-        }
-        .btn-export {
-            background-color: #34495e;
-            color: white;
-            border: none;
-            padding: 10px;
-            width: 100%;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85em;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: background 0.2s;
-        }
-        .btn-export:hover { background-color: #2c3e50; }
 
         /* Formulário */
         .form-row { display: block; width: 100%; margin-bottom: 15px; }
@@ -277,6 +302,25 @@
         }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #bbb; }
         .dot.online { background: #4CAF50; }
+
+        /* Lista de eventos no modal detalhado */
+        .item-lista-detalhe {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-lista-detalhe:last-child { border-bottom: none; }
+        .item-lista-detalhe span { font-size: 0.9em; font-weight: 600; color: #333; }
+        
+        /* Modal Sobre */
+        .sobre-texto {
+            line-height: 1.6;
+            color: var(--cor-texto);
+            font-size: 1em;
+            text-align: justify;
+        }
 
         /* --- RESPONSIVIDADE (MOBILE) --- */
         @media (max-width: 900px) {
@@ -310,13 +354,23 @@
                 border-bottom: none;
                 gap: 15px;
                 align-items: center;
+                flex-wrap: wrap; /* Permite quebrar linha se precisar */
             }
             
             .logo-container { width: auto; margin: 0; max-width: 80px; }
             .logo-container img { max-height: 50px; }
             h1 { font-size: 1em; }
 
-            #legenda-titulo { display: none; } /* Oculta título "Filtros" no mobile para economizar espaço */
+            /* Ajuste do botão sobre no mobile */
+            #btn-sobre {
+                width: auto;
+                margin: 0;
+                margin-left: auto; /* Empurra para direita */
+                padding: 6px 10px;
+                font-size: 0.75em;
+            }
+
+            .filtro-header { display: none; } /* Oculta cabeçalho desktop no mobile */
 
             #legenda {
                 flex-direction: row; /* Botões lado a lado */
@@ -367,42 +421,56 @@
                 </div>
             </header>
 
-            <div id="legenda-titulo">Filtrar Categorias</div>
+            <!-- Botão Sobre -->
+            <button id="btn-sobre" onclick="openModal('modal-sobre')">Sobre o calendário</button>
+
+            <div class="filtro-header">
+                <div id="legenda-titulo">Filtrar Categorias</div>
+                <button id="btn-limpar" onclick="limparFiltros()" title="Mostrar todos">Limpar</button>
+            </div>
+
             <div id="legenda">
+                <!-- Botão Todos (Visível em Mobile principalmente) -->
+                <div class="legenda-item ativo" onclick="limparFiltros()">
+                    <div class="marcador bg-todos"></div> Todos
+                </div>
+
+                <!-- 1. Feriados -->
                 <div class="legenda-item ativo" data-cat="feriado-nacional" onclick="selecionarFiltro('feriado-nacional', this)">
                     <div class="marcador bg-feriado"></div> Feriados
                 </div>
+                <!-- 2. Datas Comemorativas -->
                 <div class="legenda-item ativo" data-cat="data-comemorativa" onclick="selecionarFiltro('data-comemorativa', this)">
-                    <div class="marcador bg-comemorativa"></div> Comemorativa
+                    <div class="marcador bg-comemorativa"></div> Datas Comemorativas
                 </div>
+                <!-- 3. Segurança Viária -->
                 <div class="legenda-item ativo" data-cat="seguranca-viaria" onclick="selecionarFiltro('seguranca-viaria', this)">
                     <div class="marcador bg-seguranca"></div> Segurança Viária
                 </div>
+                <!-- 4. SENATRAN -->
                 <div class="legenda-item ativo" data-cat="senatran" onclick="selecionarFiltro('senatran', this)">
                     <div class="marcador bg-senatran"></div> SENATRAN
                 </div>
-                <div class="legenda-item ativo" data-cat="eventos-regionais" onclick="selecionarFiltro('eventos-regionais', this)">
-                    <div class="marcador bg-regionais"></div> Regionais
-                </div>
-                <div class="legenda-item ativo" data-cat="premiacoes" onclick="selecionarFiltro('premiacoes', this)">
-                    <div class="marcador bg-premiacoes"></div> Premiações
-                </div>
-                <div class="legenda-item ativo" data-cat="datas-internacionais" onclick="selecionarFiltro('datas-internacionais', this)">
-                    <div class="marcador bg-internacional"></div> Datas Internacionais
-                </div>
+                <!-- 5. Eventos -->
                 <div class="legenda-item ativo" data-cat="evento" onclick="selecionarFiltro('evento', this)">
                     <div class="marcador bg-evento"></div> Eventos
                 </div>
+                <!-- 6. Campanhas -->
                 <div class="legenda-item ativo" data-cat="campanha" onclick="selecionarFiltro('campanha', this)">
                     <div class="marcador bg-campanha"></div> Campanhas
                 </div>
-            </div>
-
-            <!-- Botão de Exportação -->
-            <div class="btn-export-container">
-                <button class="btn-export" onclick="exportarDados()">
-                    ⬇ Baixar Backup (JSON)
-                </button>
+                <!-- 7. Premiações -->
+                <div class="legenda-item ativo" data-cat="premiacoes" onclick="selecionarFiltro('premiacoes', this)">
+                    <div class="marcador bg-premiacoes"></div> Premiações
+                </div>
+                <!-- 8. Festas Regionais -->
+                <div class="legenda-item ativo" data-cat="eventos-regionais" onclick="selecionarFiltro('eventos-regionais', this)">
+                    <div class="marcador bg-regionais"></div> Festas Regionais
+                </div>
+                <!-- 9. Datas Internacionais -->
+                <div class="legenda-item ativo" data-cat="datas-internacionais" onclick="selecionarFiltro('datas-internacionais', this)">
+                    <div class="marcador bg-internacional"></div> Datas Internacionais
+                </div>
             </div>
 
             <!-- Status Cloud movido para a sidebar no Desktop -->
@@ -422,7 +490,21 @@
     <!-- BOTÃO FLUTUANTE -->
     <button class="fab" id="open-modal" title="Adicionar Novo Evento">+</button>
 
-    <!-- MODAL -->
+    <!-- MODAL SOBRE -->
+    <div class="modal" id="modal-sobre">
+        <div class="modal-content">
+            <h3 style="margin-top: 0; margin-bottom: 15px; color: var(--cor-titulo-mes); border-bottom: 1px solid #eee; padding-bottom: 10px;">Sobre o Calendário</h3>
+            <p class="sobre-texto">
+                O Calendário Integrado consolida, em um único ambiente, os principais marcos de segurança viária, além de datas importantes para ampliar a visibilidade, o alinhamento entre áreas e a previsibilidade da execução, apoiando a tomada de decisão e a coordenação das ações.
+            </p>
+            
+            <div class="btn-group" style="margin-top: 25px;">
+                <button class="btn btn-save" onclick="closeModal('modal-sobre')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EVENTO -->
     <div class="modal" id="modal-evento">
         <div class="modal-content">
             <h3 id="modal-title" style="margin-top: 0; margin-bottom: 20px; color: var(--cor-titulo-mes);">Novo Evento</h3>
@@ -444,21 +526,34 @@
             <div class="form-group">
                 <label for="ev-cat">Categoria</label>
                 <select id="ev-cat">
-                    <option value="evento">Evento Geral</option>
+                    <option value="feriado-nacional">Feriados</option>
+                    <option value="data-comemorativa">Datas Comemorativas</option>
                     <option value="seguranca-viaria">Segurança Viária</option>
-                    <option value="campanha">Campanha</option>
-                    <option value="data-comemorativa">Data Comemorativa</option>
                     <option value="senatran">SENATRAN</option>
-                    <option value="eventos-regionais">Festas Regionais</option>
+                    <option value="evento">Eventos</option>
+                    <option value="campanha">Campanhas</option>
                     <option value="premiacoes">Premiações</option>
+                    <option value="eventos-regionais">Festas Regionais</option>
                     <option value="datas-internacionais">Datas Internacionais</option>
-                    <option value="feriado-nacional">Feriado</option>
                 </select>
             </div>
             <div class="btn-group">
                 <button class="btn btn-cancel" onclick="closeModal('modal-evento')">Voltar</button>
                 <button class="btn btn-danger" id="btn-delete-active" style="display:none">Excluir</button>
                 <button class="btn btn-save" id="save-evento">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LISTA REGIONAIS -->
+    <div class="modal" id="modal-lista-regionais">
+        <div class="modal-content">
+            <h3 id="modal-lista-title" style="margin-top: 0; margin-bottom: 15px; color: var(--cor-titulo-mes); border-bottom: 1px solid #eee; padding-bottom: 10px;">Festas Regionais</h3>
+            <div id="lista-eventos-container" style="display: flex; flex-direction: column; gap: 0; max-height: 300px; overflow-y: auto;">
+                <!-- Lista injetada via JS -->
+            </div>
+            <div class="btn-group" style="margin-top: 20px;">
+                <button class="btn btn-cancel" style="background: var(--cor-primaria); color: white;" onclick="closeModal('modal-lista-regionais')">Fechar</button>
             </div>
         </div>
     </div>
@@ -473,21 +568,45 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, updateDoc, onSnapshot, addDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // >>>> CONFIGURE AQUI O SEU FIREBASE (copie do Firebase Console > Config do Web App)
+        // Exemplo:
+        // const firebaseConfig = { apiKey: "...", authDomain: "...", projectId: "...", appId: "..." };
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmqVKEgdFyT7QnUmiYYTtdgtqSEwf3L0Y",
+            authDomain: "calendariosegviaria.firebaseapp.com",
+            projectId: "calendariosegviaria",
+            appId: "1:825051605077:web:45e61dba2952a61941ccdc",
+        };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'calendario-seg-2026';
 
-        const TODAS_CATEGORIAS = ['evento', 'seguranca-viaria', 'campanha', 'data-comemorativa', 'senatran', 'eventos-regionais', 'premiacoes', 'feriado-nacional', 'datas-internacionais'];
+        // Coleção do Firestore: calendario/2026/eventos
+        const EVENTS_COL = collection(db, 'calendario', '2026', 'eventos');
+
+        const appId = 'calendario-seg-2026'; // identificador lógico do app (apenas para organização local)
+
+        // Atualizado para corresponder à nova ordem visual da legenda
+        const TODAS_CATEGORIAS = [
+            'feriado-nacional', 
+            'data-comemorativa', 
+            'seguranca-viaria', 
+            'senatran', 
+            'evento', 
+            'campanha', 
+            'premiacoes', 
+            'eventos-regionais', 
+            'datas-internacionais'
+        ];
 
         let state = {
             eventos: [],
             filtrosAtivos: [...TODAS_CATEGORIAS],
-            categoriaIsolada: null,
+            // categoriaIsolada removida pois agora usamos seleção múltipla
             user: null
         };
 
@@ -544,79 +663,127 @@
             {inicio: "2026-10-28", fim: "2026-10-28", nome: "Dia do Servidor Público", cat: "feriado-nacional"},
             {inicio: "2026-11-17", fim: "2026-11-17", nome: "Dia Vítimas de Trânsito", cat: "senatran"},
             {inicio: "2026-12-09", fim: "2026-12-09", nome: "Combate à Corrupção", cat: "data-comemorativa"},
-            {inicio: "2026-03-19", fim: "2026-03-22", nome: "Rodeio de Nova Granada", "cat": "eventos-regionais"},
-            {inicio: "2026-01-16", fim: "2026-01-19", nome: "Peão Santa Cruz Rio Pardo", "cat": "eventos-regionais"},
-            {inicio: "2026-04-09", fim: "2026-04-12", "nome": "Suzano Music Festival", "cat": "eventos-regionais"},
-            {inicio: "2026-05-08", fim: "2026-05-17", "nome": "Peão de Hortolândia", "cat": "eventos-regionais"},
-            {inicio: "2026-04-10", fim: "2026-04-18", "nome": "Peão de Paulínia", "cat": "eventos-regionais"},
-            {inicio: "2026-04-17", fim: "2026-04-20", "nome": "FAPIP – Peão de Palmital", "cat": "eventos-regionais"},
-            {inicio: "2026-04-30", fim: "2026-05-09", "nome": "Ribeirão Rodeo Music", "cat": "eventos-regionais"},
-            {inicio: "2026-07-08", fim: "2026-07-12", "nome": "Rio Preto Country Bulls", "cat": "eventos-regionais"},
-            {inicio: "2026-08-20", fim: "2026-08-30", "nome": "Peão de Barretos", "cat": "eventos-regionais"},
-            {inicio: "2026-06-03", fim: "2026-06-14", "nome": "Peão de Americana", "cat": "eventos-regionais"},
-            {inicio: "2026-05-15", fim: "2026-05-24", "nome": "Expô Fernandópolis", "cat": "eventos-regionais"},
-            {inicio: "2026-07-09", fim: "2026-07-13", "nome": "Festa do Cavalo de Colina", "cat": "eventos-regionais"},
-            {inicio: "2026-11-06", fim: "2026-11-08", "nome": "Fórmula 1 - GP Brasil", "cat": "eventos-regionais"},
-            {inicio: "2026-05-01", fim: "2026-05-01", "nome": "Dia do Trabalho", "cat": "feriado-nacional"},
-            {inicio: "2026-07-09", fim: "2026-07-09", "nome": "Rev. Constitucionalista", "cat": "feriado-nacional"},
-            {inicio: "2026-09-07", fim: "2026-09-07", "nome": "Independência", "cat": "feriado-nacional"},
-            {inicio: "2026-10-12", fim: "2026-10-12", "nome": "Nossa Sra. Aparecida", "cat": "feriado-nacional"},
-            {inicio: "2026-11-02", fim: "2026-11-02", "nome": "Finados", "cat": "feriado-nacional"},
-            {inicio: "2026-11-15", fim: "2026-11-15", "nome": "Proclamação República", "cat": "feriado-nacional"},
-            {inicio: "2026-11-20", fim: "2026-11-20", "nome": "Consciência Negra", "cat": "feriado-nacional"},
-            {inicio: "2026-12-25", fim: "2026-12-25", "nome": "Natal", "cat": "feriado-nacional"},
-            {inicio: "2026-09-18", fim: "2026-09-26", "nome": "Jaguariúna Rodeo Festival", "cat": "eventos-regionais"},
-            {inicio: "2026-08-04", fim: "2026-08-06", "nome": "Fi South America | São Paulo", "cat": "eventos-regionais"},
-            {inicio: "2026-06-26", fim: "2026-06-28", "nome": "São Paulo Coffee Festival ", "cat": "eventos-regionais"},
-            {inicio: "2026-06-20", fim: "2026-06-20", "nome": "BBQ em Bebedouro", "cat": "eventos-regionais"},
-            {inicio: "2026-06-19", fim: "2026-06-19", "nome": "Expoagro | Franca", "cat": "eventos-regionais"},
-            {inicio: "2026-06-03", fim: "2026-06-03", "nome": "Festa Bar do Cuca | Matão", "cat": "eventos-regionais"},
-            {inicio: "2026-05-30", fim: "2026-05-30", "nome": "BBQ em Franca", "cat": "eventos-regionais"},
-            {inicio: "2026-05-26", fim: "2026-05-29", "nome": "Fispal Food Service | São Paulo", "cat": "eventos-regionais"},
-            {inicio: "2026-05-23", fim: "2026-05-24", "nome": "Virada Cultural de São Paulo", "cat": "eventos-regionais"},
-            {inicio: "2026-05-21", fim: "2026-05-23", "nome": "Prudente Rodeo Bulls", "cat": "eventos-regionais"},
-            {inicio: "2026-05-16", fim: "2026-05-16", "nome": "Festa do Peão | Guaíra", "cat": "eventos-regionais"},
-            {inicio: "2026-05-07", fim: "2026-05-10", "nome": "Festa do Peão de Votuporanga", "cat": "eventos-regionais"},
-            {inicio: "2026-05-16", fim: "2026-05-16", "nome": "25ª Festa do Peão de Boiadeiro de Fernando Prestes", "cat": "eventos-regionais"},
-            {inicio: "2026-04-30", fim: "2026-05-02", "nome": "Barretos Motor Cycles", "cat": "eventos-regionais"},
-            {inicio: "2026-04-30", fim: "2026-05-02", "nome": "Festa do Peão de Valentim Gentil", "cat": "eventos-regionais"},
-            {inicio: "2026-04-07", fim: "2026-04-09", "nome": "Anuga Select Brazil | São Paulo", "cat": "eventos-regionais"},
-            {inicio: "2026-04-07", fim: "2026-04-07", "nome": "Show Guns N'Roses", "cat": "eventos-regionais"},
-            {inicio: "2026-03-24", fim: "2026-03-26", "nome": "Fruit Attraction São Paulo", "cat": "eventos-regionais"},
-            {inicio: "2026-03-20", fim: "2026-03-22", "nome": "Lollapalooza | São Paulo", "cat": "eventos-regionais"},
-            {inicio: "2026-03-24", fim: "2026-03-20", "nome": "Show Paralalamas do Sucesso | São Carlos", "cat": "eventos-regionais"},
-            {inicio: "2026-02-05", fim: "2026-02-05", "nome": "BBQ na Floresta | Barretos", "cat": "eventos-regionais"},
-            {inicio: "2026-01-16", fim: "2026-01-16", "nome": "Show Maiara e Maraísa | Olímpia", "cat": "eventos-regionais"},
-            {inicio: "2026-01-15", fim: "2026-02-08", "nome": "Festa da Uva de Jundiaí", "cat": "eventos-regionais"},
-            {inicio: "2026-08-28", fim: "2026-09-27", "nome": "Festa das Flores / Expoflora | Holambra", "cat": "eventos-regionais"}
+            {inicio: "2026-03-19", fim: "2026-03-22", nome: "Rodeio de Nova Granada", cat: "eventos-regionais"},
+            {inicio: "2026-01-16", fim: "2026-01-19", nome: "Peão Santa Cruz Rio Pardo", cat: "eventos-regionais"},
+            {inicio: "2026-04-09", fim: "2026-04-12", nome: "Suzano Music Festival", cat: "eventos-regionais"},
+            {inicio: "2026-05-08", fim: "2026-05-17", nome: "Peão de Hortolândia", cat: "eventos-regionais"},
+            {inicio: "2026-04-10", fim: "2026-04-18", nome: "Peão de Paulínia", cat: "eventos-regionais"},
+            {inicio: "2026-04-17", fim: "2026-04-20", nome: "FAPIP – Peão de Palmital", cat: "eventos-regionais"},
+            {inicio: "2026-04-30", fim: "2026-05-09", nome: "Ribeirão Rodeo Music", cat: "eventos-regionais"},
+            {inicio: "2026-07-08", fim: "2026-07-12", nome: "Rio Preto Country Bulls", cat: "eventos-regionais"},
+            {inicio: "2026-08-20", fim: "2026-08-30", nome: "Peão de Barretos", cat: "eventos-regionais"},
+            {inicio: "2026-06-03", fim: "2026-06-14", nome: "Peão de Americana", cat: "eventos-regionais"},
+            {inicio: "2026-05-15", fim: "2026-05-24", nome: "Expô Fernandópolis", cat: "eventos-regionais"},
+            {inicio: "2026-07-09", fim: "2026-07-13", nome: "Festa do Cavalo de Colina", cat: "eventos-regionais"},
+            {inicio: "2026-11-06", fim: "2026-11-08", nome: "Fórmula 1 - GP Brasil", cat: "eventos-regionais"},
+            {inicio: "2026-05-01", fim: "2026-05-01", nome: "Dia do Trabalho", cat: "feriado-nacional"},
+            {inicio: "2026-07-09", fim: "2026-07-09", nome: "Rev. Constitucionalista", cat: "feriado-nacional"},
+            {inicio: "2026-09-07", fim: "2026-09-07", nome: "Independência", cat: "feriado-nacional"},
+            {inicio: "2026-10-12", fim: "2026-10-12", nome: "Nossa Sra. Aparecida", cat: "feriado-nacional"},
+            {inicio: "2026-11-02", fim: "2026-11-02", nome: "Finados", cat: "feriado-nacional"},
+            {inicio: "2026-11-15", fim: "2026-11-15", nome: "Proclamação República", cat: "feriado-nacional"},
+            {inicio: "2026-11-20", fim: "2026-11-20", nome: "Consciência Negra", cat: "feriado-nacional"},
+            {inicio: "2026-12-25", fim: "2026-12-25", nome: "Natal", cat: "feriado-nacional"},
+            {inicio: "2026-09-18", fim: "2026-09-26", nome: "Jaguariúna Rodeo Festival", cat: "eventos-regionais"},
+            {inicio: "2026-08-04", fim: "2026-08-06", nome: "Fi South America | São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-06-26", fim: "2026-06-28", nome: "São Paulo Coffee Festival ", cat: "eventos-regionais"},
+            {inicio: "2026-06-20", fim: "2026-06-20", nome: "BBQ em Bebedouro", cat: "eventos-regionais"},
+            {inicio: "2026-06-19", fim: "2026-06-19", nome: "Expoagro | Franca", cat: "eventos-regionais"},
+            {inicio: "2026-06-03", fim: "2026-06-03", nome: "Festa Bar do Cuca | Matão", cat: "eventos-regionais"},
+            {inicio: "2026-05-30", fim: "2026-05-30", nome: "BBQ em Franca", cat: "eventos-regionais"},
+            {inicio: "2026-05-26", fim: "2026-05-29", nome: "Fispal Food Service | São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-05-23", fim: "2026-05-24", nome: "Virada Cultural de São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-05-21", fim: "2026-05-23", nome: "Prudente Rodeo Bulls", cat: "eventos-regionais"},
+            {inicio: "2026-05-16", fim: "2026-05-16", nome: "Festa do Peão | Guaíra", cat: "eventos-regionais"},
+            {inicio: "2026-05-07", fim: "2026-05-10", nome: "Festa do Peão de Votuporanga", cat: "eventos-regionais"},
+            {inicio: "2026-05-16", fim: "2026-05-16", nome: "25ª Festa do Peão de Boiadeiro de Fernando Prestes", cat: "eventos-regionais"},
+            {inicio: "2026-04-30", fim: "2026-05-02", nome: "Barretos Motor Cycles", cat: "eventos-regionais"},
+            {inicio: "2026-04-30", fim: "2026-05-02", nome: "Festa do Peão de Valentim Gentil", cat: "eventos-regionais"},
+            {inicio: "2026-04-07", fim: "2026-04-09", nome: "Anuga Select Brazil | São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-04-07", fim: "2026-04-07", nome: "Show Guns N'Roses", cat: "eventos-regionais"},
+            {inicio: "2026-03-24", fim: "2026-03-26", nome: "Fruit Attraction São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-03-20", fim: "2026-03-22", nome: "Lollapalooza | São Paulo", cat: "eventos-regionais"},
+            {inicio: "2026-03-24", fim: "2026-03-20", nome: "Show Paralalamas do Sucesso | São Carlos", cat: "eventos-regionais"},
+            {inicio: "2026-02-05", fim: "2026-02-05", nome: "BBQ na Floresta | Barretos", cat: "eventos-regionais"},
+            {inicio: "2026-01-16", fim: "2026-01-16", nome: "Show Maiara e Maraísa | Olímpia", cat: "eventos-regionais"},
+            {inicio: "2026-01-15", fim: "2026-02-08", nome: "Festa da Uva de Jundiaí", cat: "eventos-regionais"},
+            {inicio: "2026-08-28", fim: "2026-09-27", nome: "Festa das Flores / Expoflora | Holambra", cat: "eventos-regionais"}
         ];
 
         async function popularBancoDeDados() {
-            updateStatus("Sincronizando Base...");
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'eventos');
+            updateStatus("Sincronizando Base (Firestore)...");
+            const colRef = EVENTS_COL;
             const snapshot = await getDocs(colRef);
             if (snapshot.size === 0) {
                 for (const ev of DADOS_INICIAIS) { await addDoc(colRef, ev); }
             }
-            localStorage.setItem('db_initialized_2026_v2.7_detran', 'true');
+            localStorage.setItem(`db_initialized_${appId}_2026`, 'true');
         }
 
+        window.openModal = (id) => document.getElementById(id).classList.add('active');
         window.closeModal = (id) => document.getElementById(id).classList.remove('active');
         
-        window.selecionarFiltro = (cat, element) => {
+        window.limparFiltros = () => {
+            state.filtrosAtivos = [...TODAS_CATEGORIAS];
             const itensLegenda = document.querySelectorAll('.legenda-item');
-            if (state.categoriaIsolada === cat) {
-                state.filtrosAtivos = [...TODAS_CATEGORIAS];
-                state.categoriaIsolada = null;
-                itensLegenda.forEach(item => { item.classList.add('ativo'); item.classList.remove('desativado'); });
-            } else {
+            itensLegenda.forEach(item => { 
+                item.classList.add('ativo'); 
+                item.classList.remove('desativado'); 
+            });
+            renderizarCalendario(state.eventos);
+        };
+
+        window.selecionarFiltro = (cat, element) => {
+            // Verifica se está mostrando todos atualmente
+            const mostrandoTudo = state.filtrosAtivos.length === TODAS_CATEGORIAS.length;
+
+            if (mostrandoTudo) {
+                // Se estava mostrando tudo e clicou em um, ISOLA esse (começa filtro específico)
                 state.filtrosAtivos = [cat];
-                state.categoriaIsolada = cat;
-                itensLegenda.forEach(item => {
-                    if (item.getAttribute('data-cat') === cat) { item.classList.add('ativo'); item.classList.remove('desativado'); }
-                    else { item.classList.remove('ativo'); item.classList.add('desativado'); }
-                });
+            } else {
+                // Modo Toggle: adiciona ou remove da seleção atual
+                const index = state.filtrosAtivos.indexOf(cat);
+                if (index > -1) {
+                    state.filtrosAtivos.splice(index, 1);
+                } else {
+                    state.filtrosAtivos.push(cat);
+                }
             }
+
+            // Se o usuário desmarcou tudo, volta a mostrar todos
+            if (state.filtrosAtivos.length === 0) {
+                state.filtrosAtivos = [...TODAS_CATEGORIAS];
+            }
+            
+            // Atualiza UI das classes
+            const itensLegenda = document.querySelectorAll('.legenda-item');
+            const agoraMostrandoTudo = state.filtrosAtivos.length === TODAS_CATEGORIAS.length;
+
+            itensLegenda.forEach(item => {
+                const itemCat = item.getAttribute('data-cat');
+                
+                // Lógica para o botão "Todos" (que não tem data-cat)
+                if (!itemCat) {
+                    if (agoraMostrandoTudo) {
+                         item.classList.add('ativo');
+                         item.classList.remove('desativado');
+                    } else {
+                         item.classList.remove('ativo');
+                         item.classList.add('desativado');
+                    }
+                    return;
+                }
+
+                // Lógica para os botões de categoria
+                if (state.filtrosAtivos.includes(itemCat)) {
+                     item.classList.add('ativo');
+                     item.classList.remove('desativado');
+                } else {
+                     item.classList.remove('ativo');
+                     item.classList.add('desativado');
+                }
+            });
+
             renderizarCalendario(state.eventos);
         };
 
@@ -633,19 +800,42 @@
             document.getElementById('modal-evento').classList.add('active');
         };
 
-        // Função para Exportar/Backup dos Dados
-        window.exportarDados = () => {
-            const dadosStr = JSON.stringify(state.eventos, null, 2);
-            const blob = new Blob([dadosStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
+        window.abrirListaRegionais = (dia, mes, ano) => {
+            // Recria a data alvo para filtro
+            const targetDate = new Date(ano, mes - 1, dia);
+
+            // Filtra da lista bruta de eventos (state.eventos)
+            // Lógica: Se o evento é "eventos-regionais" E a data alvo cai entre inicio e fim
+            const lista = state.eventos.filter(e => {
+                if (e.cat !== 'eventos-regionais') return false;
+                // Ajuste de fuso/hora simples para garantir comparação de data correta
+                const start = new Date(e.inicio + "T12:00:00");
+                const end = new Date(e.fim + "T12:00:00");
+                // Zera horas para comparar apenas datas
+                const target = new Date(targetDate);
+                target.setHours(12,0,0,0);
+                
+                return target >= start && target <= end;
+            });
+
+            const container = document.getElementById('lista-eventos-container');
+            container.innerHTML = '';
             
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "backup_calendario_2026.json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            document.getElementById('modal-lista-title').innerText = `Festas Regionais (${dia}/${mes}/${ano})`;
+
+            lista.forEach(ev => {
+                const item = document.createElement('div');
+                item.className = 'item-lista-detalhe';
+                item.innerHTML = `
+                    <span>${ev.nome}</span>
+                    <button style="font-size:0.75em; padding:6px 10px; border:1px solid #ddd; background:#f9f9f9; border-radius:4px; cursor:pointer; color:#555;" onclick="closeModal('modal-lista-regionais'); abrirEdicao('${ev.id}')">
+                        Editar
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+
+            document.getElementById('modal-lista-regionais').classList.add('active');
         };
 
         function updateStatus(text, isOnline = false) {
@@ -676,18 +866,18 @@
             const mesesStr = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
             
             const temasSenatran = [
-                "Dirigir com cuidado, viver com dignidade.",
-                "Retorno às aulas: comprometa-se com a vida.",
-                "Carnaval seguro. Alegria com responsabilidade.",
-                "Áreas calmas, vidas seguras.",
-                "Desacelere. Seu bem maior é a vida.",
-                "Conheça os riscos, evite os sinistros.",
-                "Motoristas: parceiros da vida.",
-                "Ciclista seguro, cidade mais humana.",
-                "Comprometa-se com a Vida.",
-                "Olhos na estrada, não na tela.",
-                "Valorize a vida, dirija com consciência.",
-                "Férias seguras, memórias felizes."
+                "As pessoas e suas viagens.",
+                "Retorno às aulas: comprometa-se com a vida | Carnaval seguro. Alegria com responsabilidade.",
+                "Desacelerar é fundamental para a vida.",
+                "Páscoa é tempo de reflexão: construindo a Paz no trânsito.",
+                "Maio Amarelo 'No trânsito, enxergar o outro é salvar vidas.'",
+                "Alegria com responsabilidade.",
+                "Viajando nas férias de julho.",
+                "Caminhando e pedalando de forma segura.",
+                "Semana Nacional de Trânsito.",
+                "Despertar a criança que há em nós.",
+                "Pensando nas vítimas, valorizando a vida.",
+                "Hora de acalmar e refletir."
             ];
 
             const eventosProcessados = expandirEventos(eventos);
@@ -713,10 +903,26 @@
                     if ((dia + primeiroDiaSemana - 1) % 7 === 0 && dia !== 1) htmlMes += `</tr><tr>`;
                     const evsNoDia = eventosProcessados.filter(e => e.mes === mesAtualNum && e.dia === dia);
                     const ehHoje = (dia === diaHoje && mesAtualNum === mesHoje);
+                    
+                    // Lógica separada: Festas Regionais vs Outros
+                    const regionais = evsNoDia.filter(e => e.cat === 'eventos-regionais');
+                    const outros = evsNoDia.filter(e => e.cat !== 'eventos-regionais');
+
                     htmlMes += `<td class="${evsNoDia.length > 0 ? 'tem-evento' : ''} ${ehHoje ? 'dia-atual' : ''}"><span class="dia-numero">${dia}</span>`;
-                    evsNoDia.forEach(e => {
+                    
+                    // Renderiza os "outros" normalmente (um por um)
+                    outros.forEach(e => {
                         htmlMes += `<span class="evento-tag tag-${e.cat}" title="${e.nome}" onclick="abrirEdicao('${e.id}')">${e.nome}</span>`;
                     });
+
+                    // Renderiza o grupo de regionais (se houver)
+                    if (regionais.length > 0) {
+                        const qtd = regionais.length;
+                        const label = qtd === 1 ? '1 Festa Regional' : `${qtd} Festas Regionais`;
+                        // Chama função para abrir lista, passando dia, mes, ano
+                        htmlMes += `<span class="evento-tag tag-eventos-regionais tag-agrupada" title="Ver lista" onclick="abrirListaRegionais(${dia}, ${mesAtualNum}, 2026)">${label}</span>`;
+                    }
+
                     htmlMes += `</td>`;
                 }
                 const finalCelulas = (primeiroDiaSemana + totalDiasNoMes) % 7;
@@ -731,11 +937,11 @@
             if (!payload.nome || !payload.inicio || !payload.fim) return;
             updateStatus("Salvando...");
             try {
-                if (id) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventos', id), payload); }
-                else { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), payload); }
+                if (id) { await updateDoc(doc(EVENTS_COL, id), payload); }
+                else { await addDoc(EVENTS_COL, payload); }
                 closeModal('modal-evento');
                 updateStatus("Salvo", true);
-            } catch (err) { updateStatus("Erro ao salvar"); }
+            } catch (err) { console.error(err); updateStatus("Erro ao salvar"); }
         }
 
         async function handleExcluir() {
@@ -743,10 +949,10 @@
             if (!id) return;
             updateStatus("Excluindo...");
             try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventos', id));
+                await deleteDoc(doc(EVENTS_COL, id));
                 closeModal('modal-evento');
                 updateStatus("Excluído", true);
-            } catch (err) { updateStatus("Erro ao excluir"); }
+            } catch (err) { console.error(err); updateStatus("Erro ao excluir"); }
         }
 
         document.getElementById('save-evento').onclick = handleSalvar;
@@ -762,17 +968,13 @@
         };
 
         const init = async () => {
-            const initAuth = async () => {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); }
-                else { await signInAnonymously(auth); }
-            };
-            await initAuth();
+            await signInAnonymously(auth);
             onAuthStateChanged(auth, async (user) => {
                 if (!user) return;
                 state.user = user;
-                if (!localStorage.getItem('db_initialized_2026_v2.7_detran')) { await popularBancoDeDados(); }
+                if (!localStorage.getItem(`db_initialized_${appId}_2026`)) { await popularBancoDeDados(); }
                 updateStatus("Online", true);
-                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), (snapshot) => {
+                onSnapshot(EVENTS_COL, (snapshot) => {
                     const list = [];
                     snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
                     state.eventos = list;
