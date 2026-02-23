@@ -17,6 +17,9 @@
             
             /* 3. Ações Educativas */
             --cor-acoes-educativas: #FDFBD4;
+
+            /* 3.1 Ações Fiscalização */
+            --cor-acoes-fiscalizacao: #FAE3B9;
             
             /* 4. SENATRAN */
             --cor-senatran: #FFFF99;
@@ -217,6 +220,7 @@
         /* 1 */ .bg-feriados, .tag-feriados { background-color: var(--cor-feriados) !important; }
         /* 2 */ .bg-datas-comemorativas, .tag-datas-comemorativas { background-color: var(--cor-datas-comemorativas) !important; }
         /* 3 */ .bg-acoes-educativas, .tag-acoes-educativas { background-color: var(--cor-acoes-educativas) !important; }
+        /* 3.1 */ .bg-acoes-fiscalizacao, .tag-acoes-fiscalizacao { background-color: var(--cor-acoes-fiscalizacao) !important; }
         /* 4 */ .bg-senatran, .tag-senatran { background-color: var(--cor-senatran) !important; }
         /* 5 */ .bg-sistran, .tag-sistran { background-color: var(--cor-sistran) !important; }
         /* 6 */ .bg-eventos, .tag-eventos { background-color: var(--cor-eventos) !important; }
@@ -469,6 +473,10 @@
                 <div class="legenda-item ativo" data-cat="acoes-educativas" onclick="selecionarFiltro('acoes-educativas', this)">
                     <div class="marcador bg-acoes-educativas"></div> Ações Educativas
                 </div>
+                <!-- 3.1 Ações Fiscalização -->
+                <div class="legenda-item ativo" data-cat="acoes-fiscalizacao" onclick="selecionarFiltro('acoes-fiscalizacao', this)">
+                    <div class="marcador bg-acoes-fiscalizacao"></div> Ações Fiscalização
+                </div>
                 <!-- 4. SENATRAN -->
                 <div class="legenda-item ativo" data-cat="senatran" onclick="selecionarFiltro('senatran', this)">
                     <div class="marcador bg-senatran"></div> SENATRAN
@@ -561,11 +569,18 @@
                     <option value="eventos">Eventos</option>
                     <option value="pravida">PRaVida</option>
                     <option value="acoes-educativas">Ações Educativas</option>
+                    <option value="acoes-fiscalizacao">Ações Fiscalização</option>
                     <option value="campanhas-massa">Campanhas de Massa</option>
                     <option value="premiacoes">Premiações</option>
                     <option value="festas-regionais">Festas Regionais</option>
                     <option value="datas-internacionais">Datas Internacionais</option>
                 </select>
+            </div>
+            <div class="form-group" id="grupo-observacoes" style="display:none;">
+                <label for="ev-observacoes">Observações</label>
+                <textarea id="ev-observacoes"
+                    placeholder="Digite observações complementares..."
+                    style="width:100%; padding:12px; border:1px solid var(--cor-borda); border-radius:8px; font-family:inherit; font-size:0.95em; min-height:90px; resize:vertical;"></textarea>
             </div>
             <div class="btn-group">
                 <button class="btn btn-cancel" onclick="closeModal('modal-evento')">Voltar</button>
@@ -633,6 +648,7 @@
             'eventos',
             'pravida',
             'acoes-educativas',
+            'acoes-fiscalizacao',
             'campanhas-massa',
             'premiacoes',
             'festas-regionais',
@@ -644,6 +660,23 @@
             filtrosAtivos: [...TODAS_CATEGORIAS],
             user: null
         };
+
+
+        // Campo "Observações" (exibido apenas para Ações Educativas e Ações Fiscalização)
+        const selectCategoria = document.getElementById('ev-cat');
+        const grupoObservacoes = document.getElementById('grupo-observacoes');
+        const inputObservacoes = document.getElementById('ev-observacoes');
+
+        function atualizarVisibilidadeObservacoes() {
+            const cat = selectCategoria.value;
+            const deveMostrar = (cat === 'acoes-educativas' || cat === 'acoes-fiscalizacao');
+            if (grupoObservacoes) grupoObservacoes.style.display = deveMostrar ? 'block' : 'none';
+            if (!deveMostrar && inputObservacoes) inputObservacoes.value = '';
+        }
+
+        if (selectCategoria) {
+            selectCategoria.addEventListener('change', atualizarVisibilidadeObservacoes);
+        }
 
         // Dados Iniciais Atualizados com as Novas Categorias
         const DADOS_INICIAIS = [];
@@ -726,6 +759,16 @@ window.openModal = (id) => document.getElementById(id).classList.add('active');
             document.getElementById('ev-inicio').value = ev.inicio;
             document.getElementById('ev-fim').value = ev.fim;
             document.getElementById('ev-cat').value = ev.cat;
+
+            // Observações: apenas para Ações Educativas e Ações Fiscalização
+            if (ev.cat === 'acoes-educativas' || ev.cat === 'acoes-fiscalizacao') {
+                if (grupoObservacoes) grupoObservacoes.style.display = 'block';
+                if (inputObservacoes) inputObservacoes.value = ev.observacoes || '';
+            } else {
+                if (grupoObservacoes) grupoObservacoes.style.display = 'none';
+                if (inputObservacoes) inputObservacoes.value = '';
+            }
+
             document.getElementById('btn-delete-active').style.display = 'block';
             document.getElementById('modal-evento').classList.add('active');
         };
@@ -854,7 +897,20 @@ window.openModal = (id) => document.getElementById(id).classList.add('active');
 
         async function handleSalvar() {
             const id = document.getElementById('ev-id').value;
-            const payload = { nome: document.getElementById('ev-nome').value, inicio: document.getElementById('ev-inicio').value, fim: document.getElementById('ev-fim').value, cat: document.getElementById('ev-cat').value };
+            const categoria = document.getElementById('ev-cat').value;
+
+            const payload = {
+                nome: document.getElementById('ev-nome').value,
+                inicio: document.getElementById('ev-inicio').value,
+                fim: document.getElementById('ev-fim').value,
+                cat: categoria
+            };
+
+            // Observações: apenas para Ações Educativas e Ações Fiscalização
+            if (categoria === 'acoes-educativas' || categoria === 'acoes-fiscalizacao') {
+                payload.observacoes = (document.getElementById('ev-observacoes')?.value || '');
+            }
+
             if (!payload.nome || !payload.inicio || !payload.fim) return;
             updateStatus("Salvando...");
             try {
@@ -885,6 +941,7 @@ window.openModal = (id) => document.getElementById(id).classList.add('active');
             document.getElementById('ev-inicio').value = new Date().toISOString().split('T')[0];
             document.getElementById('ev-fim').value = new Date().toISOString().split('T')[0];
             document.getElementById('btn-delete-active').style.display = 'none';
+            atualizarVisibilidadeObservacoes();
             document.getElementById('modal-evento').classList.add('active');
         };
 
