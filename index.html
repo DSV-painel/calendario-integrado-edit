@@ -333,6 +333,92 @@
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #bbb; }
         .dot.online { background: #4CAF50; }
 
+        /* --- AUTH (LOGIN) --- */
+        #auth-panel{
+            margin-top: 18px;
+            padding: 12px 14px;
+            border: 1px solid var(--cor-borda);
+            border-radius: 12px;
+            background: #fafbfc;
+        }
+        #auth-panel .auth-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+            margin-bottom:6px;
+        }
+        #auth-panel .auth-label{
+            font-size:0.75em;
+            text-transform:uppercase;
+            letter-spacing:0.4px;
+            font-weight:800;
+            color: var(--cor-texto-suave);
+        }
+        #auth-panel .auth-badge{
+            font-size:0.75em;
+            font-weight:800;
+            padding:4px 8px;
+            border-radius:999px;
+            background: rgba(0,0,0,0.08);
+            color:#333;
+        }
+        #auth-panel .auth-badge.online{
+            background: rgba(76,175,80,0.18);
+            color:#1f5a2b;
+            border: 1px solid rgba(76,175,80,0.35);
+        }
+        #auth-panel .auth-email{
+            font-size:0.85em;
+            font-weight:700;
+            color:#2c3e50;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            margin-bottom:10px;
+        }
+        #auth-panel .auth-actions{
+            display:flex;
+            gap:10px;
+        }
+        .auth-btn{
+            flex:1;
+            height:42px;
+            border-radius:10px;
+            border: 1px solid var(--cor-primaria);
+            background: var(--cor-primaria);
+            color:#fff;
+            font-weight:800;
+            cursor:pointer;
+            transition: transform 0.15s, opacity 0.15s;
+        }
+        .auth-btn:hover{ transform: translateY(-1px); }
+        .auth-btn:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
+        .auth-btn-secondary{
+            background: transparent;
+            color: var(--cor-primaria);
+        }
+        .auth-hint{
+            margin-top:8px;
+            font-size:0.78em;
+            color: var(--cor-texto-suave);
+        }
+
+        /* Login modal message */
+        .login-msg{
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fff4f4;
+            border: 1px solid rgba(231,76,60,0.25);
+            color: #8a1f14;
+            font-weight: 700;
+            font-size: 0.9em;
+            display:none;
+        }
+        .login-msg.show{ display:block; }
+
+
         .item-lista-detalhe {
             padding: 12px;
             border-bottom: 1px solid #eee;
@@ -512,6 +598,19 @@
             </div>
 
             <div style="flex: 1;"></div>
+
+            <div id="auth-panel">
+                <div class="auth-row">
+                    <div class="auth-label">Acesso</div>
+                    <div class="auth-badge" id="auth-badge">Desconectado</div>
+                </div>
+                <div class="auth-email" id="auth-email">—</div>
+                <div class="auth-actions">
+                    <button class="auth-btn" id="btn-auth-login" type="button">Entrar</button>
+                    <button class="auth-btn auth-btn-secondary" id="btn-auth-logout" type="button" style="display:none;">Sair</button>
+                </div>
+            </div>
+
             <div id="status-cloud">
                 <div class="dot" id="cloud-dot"></div>
                 <span id="cloud-text">Conectando...</span>
@@ -590,6 +689,36 @@
         </div>
     </div>
 
+
+    <!-- MODAL LOGIN -->
+    <div class="modal" id="modal-login">
+        <div class="modal-content">
+            <h3 style="margin-top: 0; margin-bottom: 15px; color: var(--cor-titulo-mes); border-bottom: 1px solid #eee; padding-bottom: 10px;">Entrar</h3>
+
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="login-email">E-mail</label>
+                <input type="email" id="login-email" placeholder="seu.email@detran.sp.gov.br" autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="login-senha">Senha</label>
+                <input type="password" id="login-senha" placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <div class="login-msg" id="login-msg"></div>
+
+            <div class="btn-group" style="margin-top: 20px;">
+                <button class="btn btn-cancel" id="btn-login-cancel" type="button">Voltar</button>
+                <button class="btn btn-save" id="btn-login-submit" type="button">Entrar</button>
+            </div>
+
+            <div class="auth-hint">
+                Dica: se o calendário estiver hospedado, confirme o domínio em <b>Authentication → Settings → Authorized domains</b>.
+            </div>
+        </div>
+    </div>
+
+
     <!-- MODAL LISTA REGIONAIS -->
     <div class="modal" id="modal-lista-regionais">
         <div class="modal-content">
@@ -611,8 +740,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // Importação corrigida para incluir signInWithCustomToken
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Auth (login e senha)
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, updateDoc, onSnapshot, addDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // CONFIGURAÇÃO FORNECIDA PELO USUÁRIO
@@ -945,23 +1074,166 @@ window.openModal = (id) => document.getElementById(id).classList.add('active');
             document.getElementById('modal-evento').classList.add('active');
         };
 
-        const init = async () => {
-            const initAuth = async () => {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); }
-                else { await signInAnonymously(auth); }
-            };
-            await initAuth();
-            onAuthStateChanged(auth, async (user) => {
-                if (!user) return;
-                state.user = user;
-                if (!localStorage.getItem('db_initialized_2026_v4.0_detran')) { await popularBancoDeDados(); }
+        
+        // --- AUTH / FIRESTORE (Login por e-mail e senha) ---
+        let firestoreUnsub = null;
+
+        function setUiEnabled(enabled) {
+            const fab = document.getElementById('open-modal');
+            const saveBtn = document.getElementById('save-evento');
+            const delBtn = document.getElementById('btn-delete-active');
+
+            [fab, saveBtn, delBtn].forEach(el => {
+                if (!el) return;
+                el.disabled = !enabled;
+                el.style.opacity = enabled ? '1' : '0.55';
+                el.style.pointerEvents = enabled ? 'auto' : 'none';
+            });
+
+            if (fab) fab.title = enabled ? "Adicionar Novo Evento" : "Faça login para adicionar eventos";
+        }
+
+        function setAuthUi(user) {
+            const badge = document.getElementById('auth-badge');
+            const emailEl = document.getElementById('auth-email');
+            const btnLogin = document.getElementById('btn-auth-login');
+            const btnLogout = document.getElementById('btn-auth-logout');
+
+            if (!badge || !emailEl || !btnLogin || !btnLogout) return;
+
+            if (user) {
+                badge.textContent = "Logado";
+                badge.classList.add('online');
+                emailEl.textContent = user.email || "Usuário autenticado";
+                btnLogin.style.display = 'none';
+                btnLogout.style.display = 'inline-block';
+                setUiEnabled(true);
+            } else {
+                badge.textContent = "Desconectado";
+                badge.classList.remove('online');
+                emailEl.textContent = "—";
+                btnLogin.style.display = 'inline-block';
+                btnLogout.style.display = 'none';
+                setUiEnabled(false);
+            }
+        }
+
+        function stopFirestoreListener() {
+            if (typeof firestoreUnsub === 'function') {
+                firestoreUnsub();
+                firestoreUnsub = null;
+            }
+        }
+
+        function startFirestoreListener() {
+            stopFirestoreListener();
+            firestoreUnsub = onSnapshot(EVENTOS_REF, (snapshot) => {
+                const list = [];
+                snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
+                state.eventos = list;
+                renderizarCalendario(state.eventos);
                 updateStatus("Online", true);
-                onSnapshot(EVENTOS_REF, (snapshot) => {
-                    const list = [];
-                    snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
-                    state.eventos = list;
-                    renderizarCalendario(state.eventos);
-                }, () => updateStatus("Erro Cloud"));
+            }, () => updateStatus("Erro Cloud"));
+        }
+
+        function showLoginModal() {
+            // Não force no meio de um modal de edição já aberto: apenas exibe o login.
+            openModal('modal-login');
+            const email = document.getElementById('login-email');
+            if (email) email.focus();
+        }
+
+        function setLoginError(msg) {
+            const box = document.getElementById('login-msg');
+            if (!box) return;
+            if (!msg) {
+                box.textContent = '';
+                box.classList.remove('show');
+                return;
+            }
+            box.textContent = msg;
+            box.classList.add('show');
+        }
+
+        async function handleLogin() {
+            const email = (document.getElementById('login-email')?.value || '').trim();
+            const senha = (document.getElementById('login-senha')?.value || '').trim();
+            if (!email || !senha) {
+                setLoginError("Preencha e-mail e senha.");
+                return;
+            }
+            setLoginError("");
+            updateStatus("Entrando...");
+            try {
+                await signInWithEmailAndPassword(auth, email, senha);
+                // onAuthStateChanged vai cuidar do resto
+            } catch (err) {
+                const code = err?.code || '';
+                let msg = "Não foi possível entrar. Verifique o e-mail e a senha.";
+                if (code.includes('auth/invalid-email')) msg = "E-mail inválido.";
+                if (code.includes('auth/user-not-found')) msg = "Usuário não encontrado.";
+                if (code.includes('auth/wrong-password')) msg = "Senha incorreta.";
+                if (code.includes('auth/too-many-requests')) msg = "Muitas tentativas. Tente novamente mais tarde.";
+                if (code.includes('auth/network-request-failed')) msg = "Falha de rede. Verifique sua conexão.";
+                setLoginError(msg);
+                updateStatus("Login necessário");
+            }
+        }
+
+        async function handleLogout() {
+            updateStatus("Saindo...");
+            try {
+                await signOut(auth);
+            } catch (err) {
+                updateStatus("Erro ao sair");
+            }
+        }
+
+        // Botões do painel auth + modal
+        document.getElementById('btn-auth-login')?.addEventListener('click', () => {
+            setLoginError("");
+            showLoginModal();
+        });
+        document.getElementById('btn-auth-logout')?.addEventListener('click', handleLogout);
+
+        document.getElementById('btn-login-submit')?.addEventListener('click', handleLogin);
+        document.getElementById('btn-login-cancel')?.addEventListener('click', () => closeModal('modal-login'));
+
+        // Enter no login
+        ['login-email', 'login-senha'].forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+        });
+
+        const init = async () => {
+            // UI começa travada até autenticar
+            setUiEnabled(false);
+            setAuthUi(null);
+            updateStatus("Login necessário");
+
+            onAuthStateChanged(auth, async (user) => {
+                state.user = user || null;
+                setAuthUi(state.user);
+
+                if (!state.user) {
+                    stopFirestoreListener();
+                    // Mantém calendário (pode ficar vazio) e pede login
+                    updateStatus("Login necessário");
+                    showLoginModal();
+                    return;
+                }
+
+                // Semente do banco (mantida, mas sem criar eventos automáticos)
+                if (!localStorage.getItem('db_initialized_2026_v4.0_detran')) {
+                    await popularBancoDeDados();
+                }
+
+                closeModal('modal-login');
+                setLoginError("");
+                startFirestoreListener();
             });
         };
 
