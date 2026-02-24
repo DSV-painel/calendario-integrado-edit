@@ -102,7 +102,61 @@
             background-color: var(--bg-site);
         }
 
-        /* --- HEADER SIDEBAR --- */
+        
+        .main-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .auth-pill {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .auth-pill .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+        }
+
+        .auth-pill.online {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .auth-pill.online .dot {
+            background: #10b981;
+        }
+
+        .auth-pill-email {
+            font-size: 12px;
+            color: #475569;
+            max-width: 360px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 900px) {
+            .auth-pill-email {
+                max-width: 220px;
+            }
+        }
+/* --- HEADER SIDEBAR --- */
         header {
             display: flex; 
             flex-direction: column; 
@@ -619,6 +673,13 @@
 
         <!-- ÁREA PRINCIPAL -->
         <div class="main-content">
+            <div class="main-topbar" aria-live="polite">
+                <div class="auth-pill" id="auth-pill" title="Status de autenticação">
+                    <span class="dot" aria-hidden="true"></span>
+                    <span id="auth-pill-text">Desconectado</span>
+                </div>
+                <div class="auth-pill-email" id="auth-pill-email">—</div>
+            </div>
             <div class="calendario-container" id="calendario"></div>
         </div>
     </div>
@@ -1099,12 +1160,20 @@ window.openModal = (id) => document.getElementById(id).classList.add('active');
             const btnLogin = document.getElementById('btn-auth-login');
             const btnLogout = document.getElementById('btn-auth-logout');
 
-            if (!badge || !emailEl || !btnLogin || !btnLogout) return;
+            // Indicador no topo do calendário (conteúdo principal)
+            const pill = document.getElementById('auth-pill');
+            const pillText = document.getElementById('auth-pill-text');
+            const pillEmail = document.getElementById('auth-pill-email');
+if (!badge || !emailEl || !btnLogin || !btnLogout) return;
 
             if (user) {
                 badge.textContent = "Logado";
                 badge.classList.add('online');
                 emailEl.textContent = user.email || "Usuário autenticado";
+
+                if (pill) pill.classList.add('online');
+                if (pillText) pillText.textContent = "Logado";
+                if (pillEmail) pillEmail.textContent = user.email || "Usuário autenticado";
                 btnLogin.style.display = 'none';
                 btnLogout.style.display = 'inline-block';
                 setUiEnabled(true);
@@ -1112,6 +1181,10 @@ window.openModal = (id) => document.getElementById(id).classList.add('active');
                 badge.textContent = "Desconectado";
                 badge.classList.remove('online');
                 emailEl.textContent = "—";
+
+                if (pill) pill.classList.remove('online');
+                if (pillText) pillText.textContent = "Desconectado";
+                if (pillEmail) pillEmail.textContent = "—";
                 btnLogin.style.display = 'inline-block';
                 btnLogout.style.display = 'none';
                 setUiEnabled(false);
